@@ -1,0 +1,637 @@
+import React, { useState, useRef } from 'react';
+import { CloudUpload, Lock, CheckCircle2, AlertCircle, X, Image as ImageIcon, Sparkles } from 'lucide-react';
+import { uploadGalleryImage } from '../services/storage';
+
+export default function UploadPanel({ isOpen, onClose, onUploadSuccess }) {
+  const [file, setFile] = useState(null);
+  const [previewUrl, setPreviewUrl] = useState('');
+  const [title, setTitle] = useState('');
+  const [category, setCategory] = useState('Travel');
+  const [aspectRatio, setAspectRatio] = useState('wide');
+  const [description, setDescription] = useState('');
+
+  // Passcode Check states
+  const [passcode, setPasscode] = useState('');
+
+  // Status states
+  const [uploading, setUploading] = useState(false);
+  const [status, setStatus] = useState({ type: '', message: '' }); // 'success', 'error'
+
+  const fileInputRef = useRef(null);
+
+  // Read passcode from env or default to karl-admin
+  const EXPECTED_PASSCODE = import.meta.env.VITE_ADMIN_PASSCODE || 'karl-admin';
+
+  const handleFileChange = (e) => {
+    const selectedFile = e.target.files[0];
+    if (selectedFile) {
+      setFile(selectedFile);
+      const blobUrl = URL.createObjectURL(selectedFile);
+      setPreviewUrl(blobUrl);
+      setStatus({ type: '', message: '' });
+    }
+  };
+
+  const handleDragOver = (e) => {
+    e.preventDefault();
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    const selectedFile = e.dataTransfer.files[0];
+    if (selectedFile && selectedFile.type.startsWith('image/')) {
+      setFile(selectedFile);
+      const blobUrl = URL.createObjectURL(selectedFile);
+      setPreviewUrl(blobUrl);
+      setStatus({ type: '', message: '' });
+    } else {
+      setStatus({ type: 'error', message: 'Please drop a valid image file.' });
+    }
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    if (!file) {
+      setStatus({ type: 'error', message: 'Please select an image file.' });
+      return;
+    }
+    if (!title.trim()) {
+      setStatus({ type: 'error', message: 'Please enter a title.' });
+      return;
+    }
+
+    // Passcode Verification Gate
+    if (passcode !== EXPECTED_PASSCODE) {
+      setStatus({ type: 'error', message: 'Invalid Admin Passcode. Upload blocked.' });
+      return;
+    }
+
+    setUploading(true);
+    setStatus({ type: '', message: '' });
+
+    try {
+      const newImage = await uploadGalleryImage(file, {
+        title,
+        category,
+        aspectRatio,
+        description,
+      });
+
+      setStatus({ type: 'success', message: 'Photo uploaded and GCS metadata attached successfully!' });
+
+      // Reset form fields
+      setFile(null);
+      setPreviewUrl('');
+      setTitle('');
+      setDescription('');
+
+      // Delay closing or refresh slightly for user to read success message
+      setTimeout(() => {
+        onUploadSuccess(newImage);
+        onClose();
+        setStatus({ type: '', message: '' });
+      }, 1500);
+
+    } catch (err) {
+      console.error(err);
+      setStatus({ type: 'error', message: 'Failed to upload photo. Please check your storage bucket configs.' });
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const triggerFileSelect = () => {
+    fileInputRef.current.click();
+  };
+
+  if (!isOpen) return null;
+
+  return (
+    <div className="upload-drawer-backdrop" onClick={onClose}>
+      <div className="upload-drawer glass-card animate-slide-up" onClick={(e) => e.stopPropagation()}>
+
+        {/* Drawer Header */}
+        <div className="drawer-header">
+          <div className="drawer-title-group">
+            <Sparkles className="drawer-glow-icon" />
+            <div>
+              <h3>Admin Upload Portal</h3>
+              <p>Stream photos directly into Google Cloud Storage</p>
+            </div>
+          </div>
+          <button className="btn-close-drawer" onClick={onClose}>
+            <X size={18} />
+          </button>
+        </div>
+
+        {/* Status Messages */}
+        {status.message && (
+          <div className={`status-banner ${status.type}`}>
+            {status.type === 'success' ? (
+              <CheckCircle2 size={16} className="status-icon" />
+            ) : (
+              <AlertCircle size={16} className="status-icon" />
+            )}
+            <span>{status.message}</span>
+          </div>
+        )}
+
+        <form onSubmit={handleSubmit} className="drawer-form">
+          <div className="form-grid">
+
+            {/* Left Side: File Dropper & Preview */}
+            <div className="form-left">
+              <div
+                className={`dropzone ${file ? 'has-file' : ''}`}
+                onDragOver={handleDragOver}
+                onDrop={handleDrop}
+                onClick={triggerFileSelect}
+              >
+                <input
+                  type="file"
+                  ref={fileInputRef}
+                  onChange={handleFileChange}
+                  accept="image/*"
+                  style={{ display: 'none' }}
+                />
+
+                {previewUrl ? (
+                  <div className="preview-container">
+                    <img src={previewUrl} alt="Preview" className="image-preview" />
+                    <div className="preview-overlay">
+                      <ImageIcon size={20} />
+                      <span>Change Photo</span>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="dropzone-content">
+                    <CloudUpload className="upload-icon" size={40} />
+                    <h4>Drag & drop photo here</h4>
+                    <p>or click to browse local files</p>
+                    <span className="file-hint">Supports JPG, PNG, WEBP</span>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Right Side: Form Inputs */}
+            <div className="form-right">
+              <div className="input-group">
+                <label>Photo Title</label>
+                <input
+                  type="text"
+                  placeholder="e.g. Kyoto Golden Pavilion"
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                  disabled={uploading}
+                  required
+                />
+              </div>
+
+              <div className="input-row">
+                <div className="input-group">
+                  <label>Category</label>
+                  <select
+                    value={category}
+                    onChange={(e) => setCategory(e.target.value)}
+                    disabled={uploading}
+                  >
+                    <option value="Travel">Travel</option>
+                    <option value="Photography">Photography</option>
+                    <option value="Board Games">Board Games</option>
+                  </select>
+                </div>
+
+                <div className="input-group">
+                  <label>Aspect Ratio</label>
+                  <select
+                    value={aspectRatio}
+                    onChange={(e) => setAspectRatio(e.target.value)}
+                    disabled={uploading}
+                  >
+                    <option value="wide">Wide (Landscape)</option>
+                    <option value="portrait">Tall (Portrait)</option>
+                    <option value="square">Square</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="input-group">
+                <label>Description</label>
+                <textarea
+                  rows="3"
+                  placeholder="Describe your shot, gear used, or background context..."
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                  disabled={uploading}
+                />
+              </div>
+
+              {/* Passcode Authorization check */}
+              <div className="input-group passcode-group">
+                <label className="lock-label">
+                  <Lock size={12} className="lock-icon" /> Admin Passcode
+                </label>
+                <input
+                  type="password"
+                  placeholder="Enter passcode to authorize upload..."
+                  value={passcode}
+                  onChange={(e) => setPasscode(e.target.value)}
+                  disabled={uploading}
+                  required
+                />
+                <span className="passcode-hint">
+                  Default developer local passcode is: <code>karl-admin</code>
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <div className="form-actions">
+            <button
+              type="button"
+              className="btn-cancel"
+              onClick={onClose}
+              disabled={uploading}
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              className="btn-glow btn-submit"
+              disabled={uploading || !file || !title}
+            >
+              {uploading ? (
+                <>
+                  <div className="spinner" /> Streaming to GCS...
+                </>
+              ) : (
+                <>
+                  <CloudUpload size={16} /> Publish Photo
+                </>
+              )}
+            </button>
+          </div>
+        </form>
+
+      </div>
+
+      <style>{`
+        .upload-drawer-backdrop {
+          position: fixed;
+          inset: 0;
+          z-index: 900;
+          background: rgba(7, 20, 40, 0.6);
+          backdrop-filter: blur(10px);
+          -webkit-backdrop-filter: blur(10px);
+          display: flex;
+          align-items: flex-end;
+          justify-content: center;
+        }
+
+        .upload-drawer {
+          width: 100%;
+          max-width: 850px;
+          margin-bottom: 2rem;
+          background: rgba(10, 40, 75, 0.95);
+          border-color: var(--border-glow);
+          border-radius: 20px;
+          padding: 2rem;
+          box-shadow: 0 25px 50px -12px rgba(244, 211, 94, 0.25);
+          transform: translateY(0);
+          max-height: 90vh;
+          overflow-y: auto;
+        }
+
+        @media (max-width: 900px) {
+          .upload-drawer {
+            max-width: 100%;
+            margin-bottom: 0;
+            border-radius: 20px 20px 0 0;
+            padding: 1.5rem;
+          }
+        }
+
+        .animate-slide-up {
+          animation: slideUp 0.4s cubic-bezier(0.25, 0.8, 0.25, 1) forwards;
+        }
+
+        @keyframes slideUp {
+          from { transform: translateY(100%); }
+          to { transform: translateY(0); }
+        }
+
+        .drawer-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 1.5rem;
+          padding-bottom: 1rem;
+          border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        .drawer-title-group {
+          display: flex;
+          align-items: center;
+          gap: 0.75rem;
+        }
+
+        .drawer-glow-icon {
+          color: var(--secondary);
+          width: 24px;
+          height: 24px;
+        }
+
+        .drawer-header h3 {
+          font-size: 1.25rem;
+          font-family: var(--font-display);
+        }
+
+        .drawer-header p {
+          font-size: 0.8rem;
+          color: var(--text-muted);
+        }
+
+        .btn-close-drawer {
+          background: transparent;
+          border: none;
+          color: var(--text-muted);
+          cursor: pointer;
+          transition: var(--transition-fast);
+          padding: 0.25rem;
+          border-radius: 50%;
+        }
+
+        .btn-close-drawer:hover {
+          color: var(--text-primary);
+          background: rgba(255, 255, 255, 0.05);
+        }
+
+        /* Status banner */
+        .status-banner {
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+          padding: 0.75rem 1rem;
+          border-radius: 8px;
+          font-size: 0.85rem;
+          margin-bottom: 1.5rem;
+        }
+
+        .status-banner.success {
+          background: rgba(16, 185, 129, 0.08);
+          border: 1px solid rgba(16, 185, 129, 0.2);
+          color: #34d399;
+        }
+
+        .status-banner.error {
+          background: rgba(239, 68, 68, 0.08);
+          border: 1px solid rgba(239, 68, 68, 0.2);
+          color: #fca5a5;
+        }
+
+        /* Form grids */
+        .drawer-form {
+          display: flex;
+          flex-direction: column;
+          gap: 1.5rem;
+        }
+
+        .form-grid {
+          display: grid;
+          grid-template-columns: 1fr 1.2fr;
+          gap: 2rem;
+        }
+
+        @media (max-width: 768px) {
+          .form-grid {
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+          }
+        }
+
+        /* Dropzone */
+        .dropzone {
+          border: 2px dashed rgba(255, 255, 255, 0.12);
+          border-radius: 12px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          text-align: center;
+          cursor: pointer;
+          background: rgba(255, 255, 255, 0.01);
+          transition: var(--transition-fast);
+          height: 100%;
+          min-height: 200px;
+          overflow: hidden;
+        }
+
+        .dropzone:hover, .dropzone.has-file:hover {
+          border-color: var(--primary);
+          background: rgba(244, 211, 94, 0.03);
+        }
+
+        .dropzone-content {
+          padding: 1.5rem;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+        }
+
+        .upload-icon {
+          color: var(--text-muted);
+          margin-bottom: 0.75rem;
+          transition: var(--transition-fast);
+        }
+
+        .dropzone:hover .upload-icon {
+          color: var(--primary);
+          transform: translateY(-2px);
+        }
+
+        .dropzone h4 {
+          font-size: 0.95rem;
+          margin-bottom: 0.25rem;
+          color: var(--text-primary);
+        }
+
+        .dropzone p {
+          font-size: 0.8rem;
+          color: var(--text-muted);
+          margin-bottom: 0.5rem;
+        }
+
+        .file-hint {
+          font-size: 0.7rem;
+          color: var(--text-muted);
+          background: rgba(255, 255, 255, 0.03);
+          padding: 0.15rem 0.5rem;
+          border-radius: 4px;
+        }
+
+        /* Image Previews */
+        .preview-container {
+          width: 100%;
+          height: 100%;
+          position: relative;
+        }
+
+        .image-preview {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+        }
+
+        .preview-overlay {
+          position: absolute;
+          inset: 0;
+          background: rgba(13, 59, 102, 0.6);
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          gap: 0.5rem;
+          opacity: 0;
+          color: #fff;
+          font-size: 0.85rem;
+          transition: var(--transition-fast);
+        }
+
+        .preview-container:hover .preview-overlay {
+          opacity: 1;
+        }
+
+        /* Inputs */
+        .input-group {
+          display: flex;
+          flex-direction: column;
+          gap: 0.4rem;
+          margin-bottom: 1.25rem;
+        }
+
+        .input-row {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 1rem;
+        }
+
+        label {
+          font-size: 0.8rem;
+          font-weight: 600;
+          color: var(--text-secondary);
+          text-transform: uppercase;
+          letter-spacing: 0.05em;
+        }
+
+        input[type="text"], input[type="password"], select, textarea {
+          background: #051525;
+          border: 1px solid var(--border-light);
+          border-radius: 8px;
+          padding: 0.75rem;
+          color: var(--text-primary);
+          font-family: var(--font-sans);
+          font-size: 0.9rem;
+          transition: var(--transition-fast);
+        }
+
+        input[type="text"]:focus, input[type="password"]:focus, select:focus, textarea:focus {
+          outline: none;
+          border-color: var(--primary);
+          box-shadow: 0 0 10px rgba(244, 211, 94, 0.15);
+        }
+
+        /* Passcode section */
+        .passcode-group {
+          background: rgba(249, 87, 56, 0.03);
+          border: 1px solid rgba(249, 87, 56, 0.08);
+          padding: 0.85rem;
+          border-radius: 8px;
+          margin-bottom: 0;
+        }
+
+        .lock-label {
+          color: var(--accent);
+          display: flex;
+          align-items: center;
+          gap: 0.3rem;
+        }
+
+        .lock-icon {
+          color: var(--accent);
+        }
+
+        .passcode-hint {
+          font-size: 0.7rem;
+          color: var(--text-muted);
+          margin-top: 0.25rem;
+        }
+
+        .passcode-hint code {
+          background: rgba(255, 255, 255, 0.04);
+          padding: 0.1rem 0.3rem;
+          border-radius: 3px;
+          color: var(--accent);
+        }
+
+        /* Actions */
+        .form-actions {
+          display: flex;
+          justify-content: flex-end;
+          gap: 1rem;
+          border-top: 1px solid rgba(255, 255, 255, 0.06);
+          padding-top: 1.5rem;
+          margin-top: 0.5rem;
+        }
+
+        .btn-cancel {
+          background: rgba(255, 255, 255, 0.03);
+          border: 1px solid var(--border-light);
+          color: var(--text-secondary);
+          padding: 0.75rem 1.5rem;
+          border-radius: 9999px;
+          cursor: pointer;
+          font-family: var(--font-display);
+          font-weight: 600;
+          font-size: 0.9rem;
+          transition: var(--transition-fast);
+        }
+
+        .btn-cancel:hover {
+          background: rgba(255, 255, 255, 0.06);
+          color: var(--text-primary);
+        }
+
+        .btn-submit {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+
+        .btn-submit:disabled {
+          opacity: 0.4;
+          cursor: not-allowed;
+          box-shadow: none !important;
+          filter: none !important;
+          transform: none !important;
+        }
+
+        /* Spinner */
+        .spinner {
+          width: 16px;
+          height: 16px;
+          border: 2px solid rgba(255, 255, 255, 0.3);
+          border-radius: 50%;
+          border-top-color: #fff;
+          animation: spin 1s infinite linear;
+          margin-right: 0.5rem;
+        }
+
+        @keyframes spin {
+          to { transform: rotate(360deg); }
+        }
+      `}</style>
+
+    </div>
+  );
+}
