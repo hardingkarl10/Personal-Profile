@@ -9,6 +9,7 @@ const INITIAL_PIECES = [
   { id: 'bs1', symbol: '♗', name: 'bishop', row: 0, col: 5, color: 'var(--accent)' },
   { id: 'bs2', symbol: '♝', name: 'bishop', row: 7, col: 1, color: 'var(--accent)' },
   { id: 'qn1', symbol: '♛', name: 'queen',  row: 0, col: 4, color: 'var(--primary)' },
+  { id: 'kg1', symbol: '♔', name: 'king',   row: 4, col: 0, color: 'var(--accent)' },
 ];
 
 const BOARD_DEG = -8;
@@ -36,7 +37,7 @@ function validMoves(name, row, col, occupied = new Set()) {
     });
     return moves;
   }
-  return [[-1,0],[1,0],[-1,-1],[-1,1],[1,-1],[1,1]]
+  return [[-1,0],[1,0],[0,-1],[0,1],[-1,-1],[-1,1],[1,-1],[1,1]]
     .map(([dr, dc]) => ({ r: row + dr, c: col + dc }))
     .filter(({ r, c }) => INSIDE(r, c));
 }
