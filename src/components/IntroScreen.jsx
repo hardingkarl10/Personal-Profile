@@ -42,26 +42,45 @@ function validMoves(name, row, col, occupied = new Set()) {
     .filter(({ r, c }) => INSIDE(r, c));
 }
 
-// Returns the free square adjacent (Chebyshev dist 1) to the mouse that is
-// closest to the piece. Excludes squares in `occupied` (other pieces + mouse).
-// Bishops are color-bound, so only same-parity squares are considered.
-function getBestAdjacentTarget(piece, tRow, tCol, occupied) {
-  const bishopParity = piece.name === 'bishop' ? (piece.row + piece.col) % 2 : -1;
-  const candidates = [];
+// Greedy bipartite assignment: each adjacent square around the mouse gets at
+// most one piece, each piece gets at most one square. Sorted by a combined
+// affinity + distance score so bishops naturally land on diagonals and sliding
+// pieces on cardinals, but any piece can take any square if needed to fill all 8.
+function assignTargets(pieces, tRow, tCol) {
+  const adj = [];
   for (let dr = -1; dr <= 1; dr++) {
     for (let dc = -1; dc <= 1; dc++) {
       if (dr === 0 && dc === 0) continue;
       const r = tRow + dr, c = tCol + dc;
-      if (!INSIDE(r, c) || occupied.has(`${r},${c}`)) continue;
-      if (bishopParity !== -1 && (r + c) % 2 !== bishopParity) continue;
-      candidates.push({ r, c });
+      if (INSIDE(r, c)) adj.push({ r, c, cardinal: dr === 0 || dc === 0 });
     }
   }
-  if (!candidates.length) return null;
-  return candidates.reduce((best, m) =>
-    Math.abs(m.r - piece.row) + Math.abs(m.c - piece.col) <
-    Math.abs(best.r - piece.row) + Math.abs(best.c - piece.col) ? m : best
-  );
+
+  const pairs = [];
+  pieces.forEach((p, i) => {
+    const parity = p.name === 'bishop' ? (p.row + p.col) % 2 : -1;
+    adj.forEach(sq => {
+      if (parity !== -1 && (sq.r + sq.c) % 2 !== parity) return;
+      const alreadyThere = (p.row === sq.r && p.col === sq.c) ? -500 : 0;
+      const mismatch = (p.name === 'bishop') === sq.cardinal ? 10 : 0;
+      const dist = Math.abs(p.row - sq.r) + Math.abs(p.col - sq.c);
+      pairs.push({ i, sq, score: alreadyThere + mismatch + dist });
+    });
+  });
+
+  pairs.sort((a, b) => a.score - b.score);
+
+  const usedPieces = new Set(), usedSquares = new Set();
+  const targets = new Map();
+  for (const { i, sq } of pairs) {
+    const key = `${sq.r},${sq.c}`;
+    if (!usedPieces.has(i) && !usedSquares.has(key)) {
+      usedPieces.add(i);
+      usedSquares.add(key);
+      targets.set(i, sq);
+    }
+  }
+  return targets;
 }
 
 // BFS: finds the first step on the shortest legal path to (tRow, tCol).
@@ -106,9 +125,12 @@ export default function IntroScreen({ onComplete }) {
   const [pieces, setPieces]     = useState(INITIAL_PIECES);
   const [target, setTarget]     = useState({ row: 4, col: 4 });
 
-  const nameRef   = useRef(null);
-  const boardRef  = useRef(null);
-  const targetRef = useRef(target);
+  const [isMobile] = useState(() => navigator.maxTouchPoints > 0);
+
+  const nameRef    = useRef(null);
+  const boardRef   = useRef(null);
+  const targetRef  = useRef(target);
+  const holdTimer  = useRef(null);
 
   useEffect(() => { targetRef.current = target; }, [target]);
 
@@ -118,34 +140,64 @@ export default function IntroScreen({ onComplete }) {
     return () => clearTimeout(t);
   }, []);
 
-  // Mouse → board square (inverse-rotate around board center)
-  useEffect(() => {
-    const onMove = (e) => {
-      const board = boardRef.current;
-      if (!board) return;
-
-      const rect  = board.getBoundingClientRect();
-      const cx    = rect.left + rect.width  / 2;
-      const cy    = rect.top  + rect.height / 2;
-      const size  = board.offsetWidth; // actual size before CSS rotation
-
-      const rad = (-BOARD_DEG) * Math.PI / 180; // inverse rotation
-      const relX = e.clientX - cx;
-      const relY = e.clientY - cy;
-      const rx =  relX * Math.cos(rad) + relY * Math.sin(rad);
-      const ry = -relX * Math.sin(rad) + relY * Math.cos(rad);
-
-      const col = Math.floor((rx + size / 2) / (size / 8));
-      const row = Math.floor((ry + size / 2) / (size / 8));
-      setTarget({
-        row: Math.max(0, Math.min(7, row)),
-        col: Math.max(0, Math.min(7, col)),
-      });
+  // Convert any client coordinate to a board square (accounts for board rotation)
+  const toBoardSquare = (clientX, clientY) => {
+    const board = boardRef.current;
+    if (!board) return null;
+    const rect = board.getBoundingClientRect();
+    const cx   = rect.left + rect.width  / 2;
+    const cy   = rect.top  + rect.height / 2;
+    const size = board.offsetWidth;
+    const rad  = (-BOARD_DEG) * Math.PI / 180;
+    const relX = clientX - cx;
+    const relY = clientY - cy;
+    const rx   =  relX * Math.cos(rad) + relY * Math.sin(rad);
+    const ry   = -relX * Math.sin(rad) + relY * Math.cos(rad);
+    return {
+      row: Math.max(0, Math.min(7, Math.floor((ry + size / 2) / (size / 8)))),
+      col: Math.max(0, Math.min(7, Math.floor((rx + size / 2) / (size / 8)))),
     };
+  };
 
+  // Mouse tracking (desktop only)
+  useEffect(() => {
+    if (isMobile) return;
+    const onMove = (e) => {
+      const sq = toBoardSquare(e.clientX, e.clientY);
+      if (sq) setTarget(sq);
+    };
     window.addEventListener('mousemove', onMove);
     return () => window.removeEventListener('mousemove', onMove);
-  }, []);
+  }, [isMobile]);
+
+  // Touch tracking + press-and-hold to enter (mobile only)
+  useEffect(() => {
+    if (!isMobile) return;
+    const onTouchStart = (e) => {
+      const sq = toBoardSquare(e.touches[0].clientX, e.touches[0].clientY);
+      if (sq) setTarget(sq);
+      clearTimeout(holdTimer.current);
+      holdTimer.current = setTimeout(() => complete(), 800);
+    };
+    const onTouchMove = (e) => {
+      e.preventDefault();
+      const sq = toBoardSquare(e.touches[0].clientX, e.touches[0].clientY);
+      if (sq) setTarget(sq);
+    };
+    const onTouchEnd = () => clearTimeout(holdTimer.current);
+
+    window.addEventListener('touchstart', onTouchStart);
+    window.addEventListener('touchmove',  onTouchMove, { passive: false });
+    window.addEventListener('touchend',   onTouchEnd);
+    window.addEventListener('touchcancel', onTouchEnd);
+    return () => {
+      window.removeEventListener('touchstart', onTouchStart);
+      window.removeEventListener('touchmove',  onTouchMove);
+      window.removeEventListener('touchend',   onTouchEnd);
+      window.removeEventListener('touchcancel', onTouchEnd);
+      clearTimeout(holdTimer.current);
+    };
+  }, [isMobile]);
 
   // Move pieces toward target via BFS every tick
   useEffect(() => {
@@ -154,24 +206,28 @@ export default function IntroScreen({ onComplete }) {
         const { row: tRow, col: tCol } = targetRef.current;
         const next = [...prev];
 
-        // Randomise move order so no piece gets permanent priority
-        const order = [...next.keys()].sort(() => Math.random() - 0.5);
-        for (const i of order) {
-          if (Math.max(Math.abs(next[i].row - tRow), Math.abs(next[i].col - tCol)) <= 1) {
-            continue;
-          }
-          // Find the closest free square adjacent to the mouse (reachable BFS target)
-          const otherOcc = new Set(
-            next.filter((_, j) => j !== i).map(p => `${p.row},${p.col}`)
-          );
-          otherOcc.add(`${tRow},${tCol}`);
-          const adj = getBestAdjacentTarget(next[i], tRow, tCol, otherOcc);
-          if (!adj) continue;
+        // Assign each adjacent square to exactly one piece before moving anyone
+        const assignments = assignTargets(next, tRow, tCol);
+
+        const tryMove = (i) => {
+          const adj = assignments.get(i);
+          if (!adj || (next[i].row === adj.r && next[i].col === adj.c)) return true;
           const step = bfsStep(next[i], adj.r, adj.c, next, tRow, tCol);
-          if (step) {
-            next[i] = { ...next[i], row: step.r, col: step.c };
-          } else {
-            // BFS found no path — pick a random valid move to break the deadlock
+          if (step) { next[i] = { ...next[i], row: step.r, col: step.c }; return true; }
+          return false;
+        };
+
+        // First pass — move whoever has a clear path
+        const order = [...next.keys()].sort(() => Math.random() - 0.5);
+        const blocked = [];
+        for (const i of order) {
+          if (!tryMove(i)) blocked.push(i);
+        }
+
+        // Second pass — retry pieces that were blocked; blockers may have moved
+        for (const i of blocked) {
+          if (!tryMove(i)) {
+            // Still stuck — random move so the piece yields and opens a path
             const occ2 = new Set(next.filter((_, j) => j !== i).map(p => `${p.row},${p.col}`));
             occ2.add(`${tRow},${tCol}`);
             const any = validMoves(next[i].name, next[i].row, next[i].col, occ2);
@@ -184,8 +240,8 @@ export default function IntroScreen({ onComplete }) {
     return () => clearInterval(id);
   }, []);
 
-  // Click → FLIP name to header
-  const handleClick = () => {
+  // Flip name to header and exit
+  const complete = () => {
     if (!visible || exiting) return;
     setExiting(true);
 
@@ -206,6 +262,8 @@ export default function IntroScreen({ onComplete }) {
 
     setTimeout(onComplete, 950);
   };
+
+  const handleClick = () => { if (!isMobile) complete(); };
 
   const cls = ['intro-overlay', visible ? 'visible' : '', exiting ? 'exiting' : ''].join(' ');
 
@@ -249,7 +307,7 @@ export default function IntroScreen({ onComplete }) {
         <p className="intro-sub">Software Engineer</p>
       </div>
 
-      <p className="intro-hint">Click anywhere to continue</p>
+      <p className="intro-hint">{isMobile ? 'Hold to enter' : 'Click anywhere to continue'}</p>
 
       <style>{`
         .intro-overlay {
@@ -262,6 +320,7 @@ export default function IntroScreen({ onComplete }) {
           justify-content: center;
           cursor: pointer;
           user-select: none;
+          touch-action: none;
           transition: background-color 0.55s ease 0.5s;
         }
         .intro-overlay.exiting {
