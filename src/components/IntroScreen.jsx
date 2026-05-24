@@ -58,17 +58,22 @@ function assignTargets(pieces, tRow, tCol) {
 
   const pairs = [];
   pieces.forEach((p, i) => {
-    const parity = p.name === 'bishop' ? (p.row + p.col) % 2 : -1;
+    const isBishop = p.name === 'bishop';
+    const parity = isBishop ? (p.row + p.col) % 2 : -1;
     adj.forEach(sq => {
       if (parity !== -1 && (sq.r + sq.c) % 2 !== parity) return;
       const alreadyThere = (p.row === sq.r && p.col === sq.c) ? -500 : 0;
-      const mismatch = (p.name === 'bishop') === sq.cardinal ? 10 : 0;
+      const mismatch = isBishop === sq.cardinal ? 10 : 0;
       const dist = Math.abs(p.row - sq.r) + Math.abs(p.col - sq.c);
-      pairs.push({ i, sq, score: alreadyThere + mismatch + dist });
+      pairs.push({ i, sq, score: alreadyThere + mismatch + dist, isBishop });
     });
   });
 
-  pairs.sort((a, b) => a.score - b.score);
+  // Bishops first — they have half the eligible squares so they must claim before others
+  pairs.sort((a, b) => {
+    if (a.isBishop !== b.isBishop) return a.isBishop ? -1 : 1;
+    return a.score - b.score;
+  });
 
   const usedPieces = new Set(), usedSquares = new Set();
   const targets = new Map();
