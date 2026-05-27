@@ -232,7 +232,7 @@ export default function BoardGamesSection() {
         .bg-overlay {
           position: absolute;
           inset: 0;
-          background: linear-gradient(to top, rgba(0, 95, 115, 0.85) 0%, transparent 60%);
+          background: linear-gradient(to top, rgba(18, 69, 89, 0.85) 0%, transparent 60%);
           display: flex;
           align-items: flex-end;
           justify-content: center;
@@ -250,7 +250,7 @@ export default function BoardGamesSection() {
           display: flex;
           flex-direction: column;
           flex-grow: 1;
-          background: rgba(0, 95, 115, 0.3);
+          background: rgba(18, 69, 89, 0.3);
           border-radius: 0 0 15px 15px;
           gap: 0.4rem;
         }

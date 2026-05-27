@@ -627,7 +627,7 @@ export default function AboutSection() {
           align-items: center;
           padding: 2rem 3rem;
           border-color: rgba(var(--primary-rgb), 0.12);
-          background: rgba(0, 95, 115, 0.5);
+          background: rgba(18, 69, 89, 0.5);
         }
 
         @media (max-width: 768px) {

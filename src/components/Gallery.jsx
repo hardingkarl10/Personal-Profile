@@ -355,7 +355,7 @@ export default function Gallery({ images, loading, onSelectImage }) {
           position: absolute;
           top: 1rem;
           left: 1rem;
-          background: rgba(0, 95, 115, 0.7);
+          background: rgba(18, 69, 89, 0.7);
           backdrop-filter: blur(8px);
           -webkit-backdrop-filter: blur(8px);
           border: 1px solid rgba(255, 255, 255, 0.08);
@@ -370,7 +370,7 @@ export default function Gallery({ images, loading, onSelectImage }) {
         .card-overlay {
           position: absolute;
           inset: 0;
-          background: linear-gradient(to top, rgba(0, 95, 115, 0.85) 0%, transparent 60%);
+          background: linear-gradient(to top, rgba(18, 69, 89, 0.85) 0%, transparent 60%);
           display: flex;
           align-items: flex-end;
           justify-content: flex-start;
@@ -409,7 +409,7 @@ export default function Gallery({ images, loading, onSelectImage }) {
           display: flex;
           flex-direction: column;
           flex-grow: 1;
-          background: rgba(0, 95, 115, 0.3);
+          background: rgba(18, 69, 89, 0.3);
           border-radius: 0 0 15px 15px;
         }
 

@@ -2,14 +2,14 @@ import React, { useState, useEffect, useRef } from 'react';
 
 // ─── Chess pieces (spread around board edges to make convergence dramatic) ───
 const INITIAL_PIECES = [
-  { id: 'kn1', symbol: '♘', name: 'knight', row: 0, col: 1, color: 'var(--primary)' },
-  { id: 'kn2', symbol: '♞', name: 'knight', row: 7, col: 6, color: 'var(--secondary)' },
-  { id: 'rk1', symbol: '♜', name: 'rook',   row: 0, col: 7, color: 'var(--primary)' },
-  { id: 'rk2', symbol: '♖', name: 'rook',   row: 7, col: 0, color: 'var(--secondary)' },
-  { id: 'bs1', symbol: '♗', name: 'bishop', row: 0, col: 5, color: 'var(--accent)' },
-  { id: 'bs2', symbol: '♝', name: 'bishop', row: 7, col: 1, color: 'var(--accent)' },
-  { id: 'qn1', symbol: '♛', name: 'queen',  row: 0, col: 4, color: 'var(--primary)' },
-  { id: 'kg1', symbol: '♔', name: 'king',   row: 4, col: 0, color: 'var(--accent)' },
+  { id: 'kn1', symbol: '♘', name: 'knight', row: 0, col: 1, color: 'var(--text-primary)' },
+  { id: 'kn2', symbol: '♞', name: 'knight', row: 7, col: 6, color: 'var(--text-primary)' },
+  { id: 'rk1', symbol: '♜', name: 'rook',   row: 0, col: 7, color: 'var(--text-primary)' },
+  { id: 'rk2', symbol: '♖', name: 'rook',   row: 7, col: 0, color: 'var(--text-primary)' },
+  { id: 'bs1', symbol: '♗', name: 'bishop', row: 0, col: 5, color: 'var(--text-primary)' },
+  { id: 'bs2', symbol: '♝', name: 'bishop', row: 7, col: 1, color: 'var(--text-primary)' },
+  { id: 'qn1', symbol: '♛', name: 'queen',  row: 0, col: 4, color: 'var(--text-primary)' },
+  { id: 'kg1', symbol: '♔', name: 'king',   row: 4, col: 0, color: 'var(--text-primary)' },
 ];
 
 const BOARD_DEG = -8;
@@ -316,6 +316,11 @@ export default function IntroScreen({ onComplete }) {
 
       <style>{`
         .intro-overlay {
+          --bg-deep: #598392;
+          --primary-rgb: 174, 195, 176;
+          --accent-rgb: 18, 69, 89;
+          --text-primary: #eff6e0;
+          --text-primary-rgb: 239, 246, 224;
           position: fixed;
           inset: 0;
           z-index: 9999;
@@ -351,9 +356,9 @@ export default function IntroScreen({ onComplete }) {
           pointer-events: none;
         }
         .intro-cell { width: 100%; height: 100%; transition: background 0.25s ease; }
-        .cell-dark   { background: rgba(var(--primary-rgb), 0.06); }
-        .cell-light  { background: rgba(255, 255, 255, 0.01); }
-        .cell-target { background: rgba(var(--accent-rgb), 0.22) !important; }
+        .intro-board .cell-dark   { background: rgba(var(--accent-rgb), 0.4); }
+        .intro-board .cell-light  { background: rgba(255, 255, 255, 0.01); }
+        .intro-board .cell-target { background: rgba(var(--accent-rgb), 0.22) !important; }
 
         .intro-piece {
           position: absolute;
@@ -364,8 +369,7 @@ export default function IntroScreen({ onComplete }) {
           justify-content: center;
           font-size: clamp(2.5rem, 5.6vw, 4.4rem);
           line-height: 1;
-          opacity: 0.4;
-          filter: drop-shadow(0 0 8px currentColor);
+          opacity: 0.55;
           transition: left 0.55s cubic-bezier(0.25, 0.8, 0.25, 1),
                       top  0.55s cubic-bezier(0.25, 0.8, 0.25, 1);
           pointer-events: none;

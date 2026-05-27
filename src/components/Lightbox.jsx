@@ -258,7 +258,7 @@ export default function Lightbox({ image, imageList, onClose, onNavigate }) {
           padding: 2.5rem;
           display: flex;
           flex-direction: column;
-          background: rgba(0, 95, 115, 0.45);
+          background: rgba(18, 69, 89, 0.45);
           border: none;
           border-left: 1px solid var(--border-light);
           border-radius: 0;

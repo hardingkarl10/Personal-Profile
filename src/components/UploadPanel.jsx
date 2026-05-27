@@ -294,7 +294,7 @@ export default function UploadPanel({ isOpen, onClose, onUploadSuccess }) {
           width: 100%;
           max-width: 850px;
           margin-bottom: 2rem;
-          background: rgba(0, 95, 115, 0.95);
+          background: rgba(18, 69, 89, 0.95);
           border-color: var(--border-glow);
           border-radius: 20px;
           padding: 2rem;
@@ -486,7 +486,7 @@ export default function UploadPanel({ isOpen, onClose, onUploadSuccess }) {
         .preview-overlay {
           position: absolute;
           inset: 0;
-          background: rgba(0, 95, 115, 0.6);
+          background: rgba(18, 69, 89, 0.6);
           display: flex;
           flex-direction: column;
           align-items: center;

@@ -58,7 +58,7 @@ export default function Header({ onOpenUpload, onNavigateGame }) {
           left: 0;
           right: 0;
           z-index: 100;
-          background: rgba(0, 95, 115, 0.7);
+          background: rgba(18, 69, 89, 0.7);
           backdrop-filter: blur(20px);
           -webkit-backdrop-filter: blur(20px);
           border-bottom: 1px solid rgba(255, 255, 255, 0.06);
