@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Briefcase, GraduationCap, ChevronDown, ChevronUp, TrendingUp, MapPin, ExternalLink, Mail } from 'lucide-react';
+import { Briefcase, GraduationCap, ChevronDown, ChevronUp, TrendingUp, MapPin, ExternalLink } from 'lucide-react';
 
 const EXPERIENCE = [
   {
@@ -106,9 +106,6 @@ export default function AboutSection() {
           and chase new countries, shoot 35mm film on a Nikon FG20, and obsess over tabletop strategy games everywhere else.
         </p>
         <div className="contact-row">
-          <a href="mailto:hardingkarl10@gmail.com" className="contact-chip">
-            <Mail size={13} /> hardingkarl10@gmail.com
-          </a>
           <a href="https://www.linkedin.com/in/harding-karl" target="_blank" rel="noopener noreferrer" className="contact-chip">
             <ExternalLink size={13} /> LinkedIn
           </a>
@@ -151,16 +148,14 @@ export default function AboutSection() {
                     </div>
                   </button>
 
-                  {expanded === job.id && (
-                    <ul className="timeline-bullets">
-                      {job.bullets.map((b, i) => (
-                        <li key={i}>
-                          <span className={`bullet-dot dot-${job.accent}`} />
-                          {b}
-                        </li>
-                      ))}
-                    </ul>
-                  )}
+                  <ul className={`timeline-bullets ${expanded === job.id ? 'bullets-open' : ''}`}>
+                    {job.bullets.map((b, i) => (
+                      <li key={i} style={{ transitionDelay: expanded === job.id ? `${i * 0.07}s` : '0s' }}>
+                        <span className={`bullet-dot dot-${job.accent}`} />
+                        {b}
+                      </li>
+                    ))}
+                  </ul>
                 </div>
               </div>
             ))}
@@ -449,13 +444,26 @@ export default function AboutSection() {
 
         .timeline-bullets {
           list-style: none;
-          padding: 0 1.25rem 1.25rem;
+          padding: 0 1.25rem;
           display: flex;
           flex-direction: column;
           gap: 0.65rem;
-          border-top: 1px solid var(--border-light);
-          padding-top: 1rem;
+          border-top: 0px solid var(--border-light);
           margin-top: 0;
+          max-height: 0;
+          overflow: hidden;
+          opacity: 0;
+          transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+                      opacity 0.3s ease,
+                      padding 0.3s ease,
+                      border-top-width 0.3s ease;
+        }
+
+        .timeline-bullets.bullets-open {
+          max-height: 400px;
+          opacity: 1;
+          padding: 1rem 1.25rem 1.25rem;
+          border-top-width: 1px;
         }
 
         .timeline-bullets li {
@@ -465,6 +473,15 @@ export default function AboutSection() {
           color: var(--text-secondary);
           line-height: 1.5;
           align-items: flex-start;
+          opacity: 0;
+          transform: translateY(6px);
+          transition: opacity 0.25s ease, transform 0.25s ease;
+        }
+
+        .timeline-bullets.bullets-open li {
+          opacity: 1;
+          transform: translateY(0);
+          transition-delay: 0s;
         }
 
         .bullet-dot {

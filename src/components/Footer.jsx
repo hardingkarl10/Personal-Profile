@@ -10,7 +10,7 @@ export default function Footer() {
             <Compass className="logo-icon" size={16} />
             <span>Karl Harding</span>
           </div>
-          <p className="footer-tagline">High-performance GCP-accelerated portfolio assets</p>
+          <p className="footer-tagline">Photos served from Google Cloud Storage</p>
         </div>
 
         <div className="footer-copyright">

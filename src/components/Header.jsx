@@ -12,7 +12,9 @@ export default function Header({ onOpenUpload, onNavigateGame }) {
         <nav className="nav-links">
           <a href="#about" className="nav-link">About</a>
           <a href="#gallery" className="nav-link">Gallery</a>
+          {/* TODO: unhide when game is ready
           <button type="button" className="nav-link nav-link-btn" onClick={onNavigateGame}>Game</button>
+          */}
         </nav>
 
         <div className="social-links">

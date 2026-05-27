@@ -23,6 +23,9 @@ export default function Hero({ onOpenUpload }) {
           <a href="#gallery" className="btn-glow">
             Explore Photos <ArrowRight size={16} />
           </a>
+          <a href="#board-games" className="btn-glow btn-glow-secondary">
+            Explore Games <Dices size={16} />
+          </a>
         </div>
 
         {/* Tailored stats reflecting travel, board games, photography, code */}
@@ -121,6 +124,20 @@ export default function Hero({ onOpenUpload }) {
             width: 100%;
             justify-content: center;
           }
+        }
+
+        .btn-glow-secondary {
+          background: rgba(255, 255, 255, 0.03);
+          border-color: var(--border-light);
+          color: var(--text-primary);
+          box-shadow: none;
+        }
+
+        .btn-glow-secondary:hover {
+          background: rgba(var(--secondary-rgb), 0.08);
+          border-color: rgba(var(--secondary-rgb), 0.4);
+          box-shadow: 0 0 20px rgba(var(--secondary-rgb), 0.2);
+          color: var(--secondary);
         }
 
         .upload-trigger-btn {
