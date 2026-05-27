@@ -23,7 +23,7 @@ export default function Footer() {
 
       <style>{`
         .footer-glass {
-          background: rgba(8, 30, 56, 0.9);
+          background: rgba(0, 18, 25, 0.9);
           border-top: 1px solid var(--border-light);
           padding: 3rem 0;
           margin-top: auto;

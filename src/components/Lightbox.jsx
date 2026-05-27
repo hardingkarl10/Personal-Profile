@@ -114,7 +114,7 @@ export default function Lightbox({ image, imageList, onClose, onNavigate }) {
           position: fixed;
           inset: 0;
           z-index: 1000;
-          background: rgba(7, 20, 40, 0.85);
+          background: rgba(0, 18, 25, 0.85);
           backdrop-filter: blur(15px);
           -webkit-backdrop-filter: blur(15px);
           display: flex;
@@ -141,7 +141,7 @@ export default function Lightbox({ image, imageList, onClose, onNavigate }) {
           right: 1.5rem;
           background: rgba(255, 255, 255, 0.03);
           border: 1px solid var(--border-light);
-          color: #fff;
+          color: var(--text-primary);
           width: 48px;
           height: 48px;
           border-radius: 50%;
@@ -154,7 +154,7 @@ export default function Lightbox({ image, imageList, onClose, onNavigate }) {
         }
 
         .lightbox-close:hover {
-          background: rgba(249, 87, 56, 0.15);
+          background: rgba(var(--accent-rgb), 0.15);
           border-color: var(--accent);
           color: var(--accent);
           transform: rotate(90deg);
@@ -179,7 +179,7 @@ export default function Lightbox({ image, imageList, onClose, onNavigate }) {
         }
 
         .lightbox-arrow:hover {
-          background: rgba(244, 211, 94, 0.1);
+          background: rgba(var(--primary-rgb), 0.1);
           border-color: var(--primary);
           color: var(--text-primary);
         }
@@ -215,7 +215,7 @@ export default function Lightbox({ image, imageList, onClose, onNavigate }) {
           display: grid;
           grid-template-columns: 1.4fr 1fr;
           width: 100%;
-          background: #071d33;
+          background: var(--ink-black);
           border-radius: 20px;
           border: 1px solid var(--border-light);
           overflow: hidden;
@@ -234,7 +234,7 @@ export default function Lightbox({ image, imageList, onClose, onNavigate }) {
           display: flex;
           align-items: center;
           justify-content: center;
-          background: #051525;
+          background: var(--ink-black);
           padding: 1.5rem;
           min-height: 350px;
           max-height: 70vh;
@@ -258,7 +258,7 @@ export default function Lightbox({ image, imageList, onClose, onNavigate }) {
           padding: 2.5rem;
           display: flex;
           flex-direction: column;
-          background: rgba(10, 40, 75, 0.45);
+          background: rgba(0, 95, 115, 0.45);
           border: none;
           border-left: 1px solid var(--border-light);
           border-radius: 0;

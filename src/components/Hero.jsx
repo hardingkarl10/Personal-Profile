@@ -9,10 +9,6 @@ export default function Hero({ onOpenUpload }) {
       <div className="glow-ambient glow-cyan" style={{ bottom: '20%', right: '10%' }}></div>
 
       <div className="hero-content animate-fade-in">
-        <div className="badge-glass">
-          <Terminal className="badge-icon" size={14} />
-          <span>Karl // Software Engineer & Visual Creator</span>
-        </div>
 
         <h1 className="hero-title">
           Code, Photography &<br />
@@ -79,27 +75,6 @@ export default function Hero({ onOpenUpload }) {
           display: flex;
           flex-direction: column;
           align-items: center;
-        }
-
-        .badge-glass {
-          display: inline-flex;
-          align-items: center;
-          gap: 0.5rem;
-          background: rgba(255, 255, 255, 0.04);
-          backdrop-filter: blur(8px);
-          -webkit-backdrop-filter: blur(8px);
-          border: 1px solid rgba(255, 255, 255, 0.08);
-          padding: 0.5rem 1.25rem;
-          border-radius: 9999px;
-          font-size: 0.85rem;
-          font-weight: 500;
-          color: var(--text-secondary);
-          margin-bottom: 2rem;
-          box-shadow: var(--shadow-sm);
-        }
-
-        .badge-icon {
-          color: var(--secondary);
         }
 
         .hero-title {
@@ -169,8 +144,8 @@ export default function Hero({ onOpenUpload }) {
 
         .btn-secondary-link:hover {
           color: var(--secondary);
-          border-color: rgba(238, 150, 75, 0.25);
-          background: rgba(238, 150, 75, 0.05);
+          border-color: rgba(var(--secondary-rgb), 0.25);
+          background: rgba(var(--secondary-rgb), 0.05);
           transform: translateY(-2px);
         }
 
@@ -212,20 +187,20 @@ export default function Hero({ onOpenUpload }) {
 
         .stat-icon.purple {
           color: var(--primary);
-          background: rgba(244, 211, 94, 0.08);
-          border-color: rgba(244, 211, 94, 0.15);
+          background: rgba(var(--primary-rgb), 0.08);
+          border-color: rgba(var(--primary-rgb), 0.15);
         }
 
         .stat-icon.cyan {
           color: var(--secondary);
-          background: rgba(238, 150, 75, 0.08);
-          border-color: rgba(238, 150, 75, 0.15);
+          background: rgba(var(--secondary-rgb), 0.08);
+          border-color: rgba(var(--secondary-rgb), 0.15);
         }
 
         .stat-icon.pink {
           color: var(--accent);
-          background: rgba(249, 87, 56, 0.08);
-          border-color: rgba(249, 87, 56, 0.15);
+          background: rgba(var(--accent-rgb), 0.08);
+          border-color: rgba(var(--accent-rgb), 0.15);
         }
 
         .stat-info {

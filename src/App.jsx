@@ -5,6 +5,8 @@ import Gallery from './components/Gallery';
 import Lightbox from './components/Lightbox';
 import UploadPanel from './components/UploadPanel';
 import AboutSection from './components/AboutSection';
+import BoardGamesSection from './components/BoardGamesSection';
+import NavalGame from './components/NavalGame';
 import Footer from './components/Footer';
 import ChessBackground from './components/ChessBackground';
 import IntroScreen from './components/IntroScreen';
@@ -21,10 +23,16 @@ export default function App() {
     () => !sessionStorage.getItem('intro-seen')
   );
 
+  // 'home' | 'game' — naval combat opens as a fullscreen page
+  const [page, setPage] = useState('home');
+
   const handleIntroComplete = () => {
     sessionStorage.setItem('intro-seen', '1');
     setShowIntro(false);
   };
+
+  const goToGame = () => setPage('game');
+  const goHome   = () => setPage('home');
 
   // Upload Portal states
   const [isUploadOpen, setIsUploadOpen] = useState(false);
@@ -92,6 +100,11 @@ export default function App() {
     }, 4000);
   };
 
+  // Fullscreen game page — return early so the homepage isn't rendered behind it
+  if (page === 'game') {
+    return <NavalGame onBack={goHome} />;
+  }
+
   return (
     <div className="app-root">
       {showIntro && <IntroScreen onComplete={handleIntroComplete} />}
@@ -104,7 +117,7 @@ export default function App() {
       <div className="glow-ambient glow-cyan" style={{ top: '35%', right: '5%' }}></div>
       
       {/* Navigation Header */}
-      <Header onOpenUpload={handleOpenUpload} />
+      <Header onOpenUpload={handleOpenUpload} onNavigateGame={goToGame} />
       
       {/* Hero Visual Section */}
       <Hero onOpenUpload={handleOpenUpload} />
@@ -112,12 +125,14 @@ export default function App() {
       {/* Main Gallery Area */}
       <AboutSection />
 
+      <BoardGamesSection />
+
       <Gallery
         images={images}
         loading={loading}
         onSelectImage={handleSelectImage}
       />
-      
+
       {/* Footer Branding */}
       <Footer />
       
@@ -161,21 +176,21 @@ export default function App() {
           bottom: 2rem;
           right: 2rem;
           z-index: 1200;
-          background: rgba(16, 185, 129, 0.95);
+          background: rgba(var(--success-rgb), 0.95);
           backdrop-filter: blur(10px);
           -webkit-backdrop-filter: blur(10px);
-          border: 1px solid rgba(52, 211, 153, 0.3);
-          color: #fff;
+          border: 1px solid rgba(var(--success-rgb), 0.3);
+          color: var(--ink-black);
           padding: 1rem 1.5rem;
           border-radius: 12px;
           display: flex;
           align-items: center;
           gap: 0.75rem;
-          box-shadow: 0 10px 30px rgba(16, 185, 129, 0.25);
+          box-shadow: 0 10px 30px rgba(var(--success-rgb), 0.25);
         }
 
         .toast-icon {
-          color: #fff;
+          color: var(--ink-black);
           flex-shrink: 0;
         }
 

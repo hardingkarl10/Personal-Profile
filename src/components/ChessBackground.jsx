@@ -182,11 +182,11 @@ export default function ChessBackground() {
           display: grid;
           grid-template-columns: repeat(8, 1fr);
           grid-template-rows: repeat(8, 1fr);
-          border: 1px solid rgba(244, 211, 94, 0.15);
+          border: 1px solid rgba(var(--primary-rgb), 0.15);
           border-radius: 4px;
           overflow: hidden;
           box-shadow:
-            0 0 80px rgba(244, 211, 94, 0.06),
+            0 0 80px rgba(var(--primary-rgb), 0.06),
             inset 0 0 40px rgba(0, 0, 0, 0.3);
         }
 
@@ -196,7 +196,7 @@ export default function ChessBackground() {
         }
 
         .cell-dark {
-          background: rgba(244, 211, 94, 0.07);
+          background: rgba(var(--primary-rgb), 0.07);
         }
 
         .cell-light {

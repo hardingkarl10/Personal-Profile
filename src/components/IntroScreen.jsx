@@ -319,7 +319,7 @@ export default function IntroScreen({ onComplete }) {
           position: fixed;
           inset: 0;
           z-index: 9999;
-          background: #0d3b66;
+          background: var(--bg-deep);
           display: flex;
           align-items: center;
           justify-content: center;
@@ -344,16 +344,16 @@ export default function IntroScreen({ onComplete }) {
           display: grid;
           grid-template-columns: repeat(8, 1fr);
           grid-template-rows: repeat(8, 1fr);
-          border: 1px solid rgba(244, 211, 94, 0.12);
+          border: 1px solid rgba(var(--primary-rgb), 0.12);
           border-radius: 4px;
           overflow: hidden;
-          box-shadow: 0 0 80px rgba(244, 211, 94, 0.04);
+          box-shadow: 0 0 80px rgba(var(--primary-rgb), 0.04);
           pointer-events: none;
         }
         .intro-cell { width: 100%; height: 100%; transition: background 0.25s ease; }
-        .cell-dark   { background: rgba(244, 211, 94, 0.06); }
+        .cell-dark   { background: rgba(var(--primary-rgb), 0.06); }
         .cell-light  { background: rgba(255, 255, 255, 0.01); }
-        .cell-target { background: rgba(249, 87, 56, 0.22) !important; }
+        .cell-target { background: rgba(var(--accent-rgb), 0.22) !important; }
 
         .intro-piece {
           position: absolute;
@@ -383,7 +383,7 @@ export default function IntroScreen({ onComplete }) {
           font-family: 'Aboreto', serif;
           font-size: clamp(2.6rem, 8vw, 7.5rem);
           font-weight: 400;
-          color: #faf0ca;
+          color: var(--text-primary);
           letter-spacing: 0.05em;
           margin: 0;
           line-height: 1;
@@ -393,14 +393,14 @@ export default function IntroScreen({ onComplete }) {
                       transform 0.9s cubic-bezier(0.25, 0.8, 0.25, 1) 0.15s;
           transform-origin: center center;
           will-change: transform, opacity;
-          text-shadow: 0 0 80px rgba(244, 211, 94, 0.1);
+          text-shadow: 0 0 80px rgba(var(--primary-rgb), 0.1);
         }
         .intro-overlay.visible .intro-name { opacity: 1; transform: translateY(0); }
 
         .intro-line {
           width: 0;
           height: 1px;
-          background: rgba(244, 211, 94, 0.35);
+          background: rgba(var(--primary-rgb), 0.35);
           margin: 1.5rem 0 1.25rem;
           transition: width 0.7s ease 0.85s;
         }
@@ -412,7 +412,7 @@ export default function IntroScreen({ onComplete }) {
           font-size: clamp(0.65rem, 1.4vw, 0.85rem);
           letter-spacing: 0.38em;
           text-transform: uppercase;
-          color: rgba(250, 240, 202, 0.5);
+          color: rgba(var(--text-primary-rgb), 0.5);
           margin: 0;
           opacity: 0;
           transition: opacity 0.7s ease 1s;
@@ -428,7 +428,7 @@ export default function IntroScreen({ onComplete }) {
           font-size: 0.68rem;
           letter-spacing: 0.22em;
           text-transform: uppercase;
-          color: rgba(250, 240, 202, 0.35);
+          color: rgba(var(--text-primary-rgb), 0.35);
           margin: 0;
           opacity: 0;
           transition: opacity 0.6s ease 1.5s;

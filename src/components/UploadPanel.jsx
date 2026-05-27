@@ -282,7 +282,7 @@ export default function UploadPanel({ isOpen, onClose, onUploadSuccess }) {
           position: fixed;
           inset: 0;
           z-index: 900;
-          background: rgba(7, 20, 40, 0.6);
+          background: rgba(0, 18, 25, 0.6);
           backdrop-filter: blur(10px);
           -webkit-backdrop-filter: blur(10px);
           display: flex;
@@ -294,11 +294,11 @@ export default function UploadPanel({ isOpen, onClose, onUploadSuccess }) {
           width: 100%;
           max-width: 850px;
           margin-bottom: 2rem;
-          background: rgba(10, 40, 75, 0.95);
+          background: rgba(0, 95, 115, 0.95);
           border-color: var(--border-glow);
           border-radius: 20px;
           padding: 2rem;
-          box-shadow: 0 25px 50px -12px rgba(244, 211, 94, 0.25);
+          box-shadow: 0 25px 50px -12px rgba(var(--primary-rgb), 0.25);
           transform: translateY(0);
           max-height: 90vh;
           overflow-y: auto;
@@ -380,15 +380,15 @@ export default function UploadPanel({ isOpen, onClose, onUploadSuccess }) {
         }
 
         .status-banner.success {
-          background: rgba(16, 185, 129, 0.08);
-          border: 1px solid rgba(16, 185, 129, 0.2);
-          color: #34d399;
+          background: rgba(var(--success-rgb), 0.08);
+          border: 1px solid rgba(var(--success-rgb), 0.2);
+          color: var(--success-light);
         }
 
         .status-banner.error {
-          background: rgba(239, 68, 68, 0.08);
-          border: 1px solid rgba(239, 68, 68, 0.2);
-          color: #fca5a5;
+          background: rgba(var(--error-rgb), 0.08);
+          border: 1px solid rgba(var(--error-rgb), 0.2);
+          color: var(--error-light);
         }
 
         /* Form grids */
@@ -429,7 +429,7 @@ export default function UploadPanel({ isOpen, onClose, onUploadSuccess }) {
 
         .dropzone:hover, .dropzone.has-file:hover {
           border-color: var(--primary);
-          background: rgba(244, 211, 94, 0.03);
+          background: rgba(var(--primary-rgb), 0.03);
         }
 
         .dropzone-content {
@@ -486,14 +486,14 @@ export default function UploadPanel({ isOpen, onClose, onUploadSuccess }) {
         .preview-overlay {
           position: absolute;
           inset: 0;
-          background: rgba(13, 59, 102, 0.6);
+          background: rgba(0, 95, 115, 0.6);
           display: flex;
           flex-direction: column;
           align-items: center;
           justify-content: center;
           gap: 0.5rem;
           opacity: 0;
-          color: #fff;
+          color: var(--text-primary);
           font-size: 0.85rem;
           transition: var(--transition-fast);
         }
@@ -525,7 +525,7 @@ export default function UploadPanel({ isOpen, onClose, onUploadSuccess }) {
         }
 
         input[type="text"], input[type="password"], select, textarea {
-          background: #051525;
+          background: var(--ink-black);
           border: 1px solid var(--border-light);
           border-radius: 8px;
           padding: 0.75rem;
@@ -538,13 +538,13 @@ export default function UploadPanel({ isOpen, onClose, onUploadSuccess }) {
         input[type="text"]:focus, input[type="password"]:focus, select:focus, textarea:focus {
           outline: none;
           border-color: var(--primary);
-          box-shadow: 0 0 10px rgba(244, 211, 94, 0.15);
+          box-shadow: 0 0 10px rgba(var(--primary-rgb), 0.15);
         }
 
         /* Passcode section */
         .passcode-group {
-          background: rgba(249, 87, 56, 0.03);
-          border: 1px solid rgba(249, 87, 56, 0.08);
+          background: rgba(var(--accent-rgb), 0.03);
+          border: 1px solid rgba(var(--accent-rgb), 0.08);
           padding: 0.85rem;
           border-radius: 8px;
           margin-bottom: 0;
@@ -622,7 +622,7 @@ export default function UploadPanel({ isOpen, onClose, onUploadSuccess }) {
           height: 16px;
           border: 2px solid rgba(255, 255, 255, 0.3);
           border-radius: 50%;
-          border-top-color: #fff;
+          border-top-color: var(--text-primary);
           animation: spin 1s infinite linear;
           margin-right: 0.5rem;
         }

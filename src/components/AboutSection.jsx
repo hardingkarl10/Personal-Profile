@@ -79,7 +79,7 @@ const SKILL_GROUPS = [
   {
     label: 'Tools & Process',
     accent: 'muted',
-    skills: ['Git', 'Google Cloud', 'Agile / Scrum', 'Technical Docs'],
+    skills: ['Git', 'Google Cloud', 'Agile / Scrum', 'Technical Docs', 'AI-Assisted Dev'],
   },
 ];
 
@@ -103,7 +103,7 @@ export default function AboutSection() {
         <h2 className="about-title">About Me</h2>
         <p className="about-subtitle">
           Software engineer by trade, explorer by habit. I build high-performance systems at Buildertrend by day —
-          and chase new countries, shoot with a Sony Alpha, and obsess over tabletop strategy games everywhere else.
+          and chase new countries, shoot 35mm film on a Nikon FG20, and obsess over tabletop strategy games everywhere else.
         </p>
         <div className="contact-row">
           <a href="mailto:hardingkarl10@gmail.com" className="contact-chip">
@@ -247,7 +247,7 @@ export default function AboutSection() {
           gap: 0.4rem;
           font-size: 0.8rem;
           color: var(--text-secondary);
-          background: rgba(250, 240, 202, 0.05);
+          background: rgba(var(--text-primary-rgb), 0.05);
           border: 1px solid var(--border-light);
           padding: 0.35rem 0.85rem;
           border-radius: 9999px;
@@ -258,7 +258,7 @@ export default function AboutSection() {
         .contact-chip:hover {
           color: var(--text-primary);
           border-color: var(--primary);
-          background: rgba(244, 211, 94, 0.08);
+          background: rgba(var(--primary-rgb), 0.08);
         }
 
         /* Body layout */
@@ -334,9 +334,9 @@ export default function AboutSection() {
           background: var(--bg-deep);
         }
 
-        .accent-gold .timeline-dot { color: var(--primary); box-shadow: 0 0 10px rgba(244, 211, 94, 0.4); }
-        .accent-orange .timeline-dot { color: var(--secondary); box-shadow: 0 0 8px rgba(238, 150, 75, 0.3); }
-        .accent-red .timeline-dot { color: var(--accent); box-shadow: 0 0 8px rgba(249, 87, 56, 0.3); }
+        .accent-gold .timeline-dot { color: var(--primary); box-shadow: 0 0 10px rgba(var(--primary-rgb), 0.4); }
+        .accent-orange .timeline-dot { color: var(--secondary); box-shadow: 0 0 8px rgba(var(--secondary-rgb), 0.3); }
+        .accent-red .timeline-dot { color: var(--accent); box-shadow: 0 0 8px rgba(var(--accent-rgb), 0.3); }
         .accent-muted .timeline-dot { color: var(--text-muted); }
 
         /* Pulse on current role */
@@ -390,10 +390,10 @@ export default function AboutSection() {
           border-radius: 9999px;
         }
 
-        .tag-gold { background: rgba(244, 211, 94, 0.15); color: var(--primary); }
-        .tag-orange { background: rgba(238, 150, 75, 0.15); color: var(--secondary); }
-        .tag-red { background: rgba(249, 87, 56, 0.15); color: var(--accent); }
-        .tag-muted { background: rgba(250, 240, 202, 0.06); color: var(--text-muted); }
+        .tag-gold { background: rgba(var(--primary-rgb), 0.15); color: var(--primary); }
+        .tag-orange { background: rgba(var(--secondary-rgb), 0.15); color: var(--secondary); }
+        .tag-red { background: rgba(var(--accent-rgb), 0.15); color: var(--accent); }
+        .tag-muted { background: rgba(var(--text-primary-rgb), 0.06); color: var(--text-muted); }
 
         .job-period {
           font-size: 0.75rem;
@@ -436,10 +436,10 @@ export default function AboutSection() {
           border-radius: 9999px;
         }
 
-        .chip-gold { background: rgba(244, 211, 94, 0.1); color: var(--primary); }
-        .chip-orange { background: rgba(238, 150, 75, 0.1); color: var(--secondary); }
-        .chip-red { background: rgba(249, 87, 56, 0.1); color: var(--accent); }
-        .chip-muted { background: rgba(250, 240, 202, 0.05); color: var(--text-muted); }
+        .chip-gold { background: rgba(var(--primary-rgb), 0.1); color: var(--primary); }
+        .chip-orange { background: rgba(var(--secondary-rgb), 0.1); color: var(--secondary); }
+        .chip-red { background: rgba(var(--accent-rgb), 0.1); color: var(--accent); }
+        .chip-muted { background: rgba(var(--text-primary-rgb), 0.05); color: var(--text-muted); }
 
         .expand-icon {
           color: var(--text-muted);
@@ -528,37 +528,37 @@ export default function AboutSection() {
         }
 
         .pill-gold {
-          background: rgba(244, 211, 94, 0.08);
-          border-color: rgba(244, 211, 94, 0.2);
+          background: rgba(var(--primary-rgb), 0.08);
+          border-color: rgba(var(--primary-rgb), 0.2);
           color: var(--primary);
         }
-        .pill-gold:hover { background: rgba(244, 211, 94, 0.18); }
+        .pill-gold:hover { background: rgba(var(--primary-rgb), 0.18); }
 
         .pill-orange {
-          background: rgba(238, 150, 75, 0.08);
-          border-color: rgba(238, 150, 75, 0.2);
+          background: rgba(var(--secondary-rgb), 0.08);
+          border-color: rgba(var(--secondary-rgb), 0.2);
           color: var(--secondary);
         }
-        .pill-orange:hover { background: rgba(238, 150, 75, 0.18); }
+        .pill-orange:hover { background: rgba(var(--secondary-rgb), 0.18); }
 
         .pill-red {
-          background: rgba(249, 87, 56, 0.08);
-          border-color: rgba(249, 87, 56, 0.2);
+          background: rgba(var(--accent-rgb), 0.08);
+          border-color: rgba(var(--accent-rgb), 0.2);
           color: var(--accent);
         }
-        .pill-red:hover { background: rgba(249, 87, 56, 0.18); }
+        .pill-red:hover { background: rgba(var(--accent-rgb), 0.18); }
 
         .pill-muted {
-          background: rgba(250, 240, 202, 0.04);
+          background: rgba(var(--text-primary-rgb), 0.04);
           border-color: var(--border-light);
           color: var(--text-secondary);
         }
-        .pill-muted:hover { background: rgba(250, 240, 202, 0.08); }
+        .pill-muted:hover { background: rgba(var(--text-primary-rgb), 0.08); }
 
         /* Education */
         .edu-block {
           padding: 1.5rem;
-          border-color: rgba(244, 211, 94, 0.15);
+          border-color: rgba(var(--primary-rgb), 0.15);
           display: flex;
           flex-direction: column;
           gap: 0.75rem;
@@ -577,8 +577,8 @@ export default function AboutSection() {
           align-items: center;
           justify-content: center;
           border-radius: 12px;
-          background: rgba(244, 211, 94, 0.1);
-          border: 1px solid rgba(244, 211, 94, 0.2);
+          background: rgba(var(--primary-rgb), 0.1);
+          border: 1px solid rgba(var(--primary-rgb), 0.2);
           color: var(--primary);
           flex-shrink: 0;
         }
@@ -609,8 +609,8 @@ export default function AboutSection() {
           grid-template-columns: repeat(4, 1fr) repeat(3, auto);
           align-items: center;
           padding: 2rem 3rem;
-          border-color: rgba(244, 211, 94, 0.12);
-          background: rgba(10, 40, 75, 0.5);
+          border-color: rgba(var(--primary-rgb), 0.12);
+          background: rgba(0, 95, 115, 0.5);
         }
 
         @media (max-width: 768px) {

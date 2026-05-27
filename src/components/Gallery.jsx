@@ -140,8 +140,8 @@ export default function Gallery({ images, loading, onSelectImage }) {
           gap: 1rem;
           padding: 1rem 1.5rem;
           margin-bottom: 3rem;
-          border-color: rgba(238, 150, 75, 0.2);
-          background: rgba(238, 150, 75, 0.04);
+          border-color: rgba(var(--secondary-rgb), 0.2);
+          background: rgba(var(--secondary-rgb), 0.04);
         }
 
         @media (max-width: 640px) {
@@ -265,9 +265,8 @@ export default function Gallery({ images, loading, onSelectImage }) {
         .filter-btn.active {
           background: var(--primary);
           border-color: var(--primary);
-          color: #fff;
-          box-shadow: 0 0 15px rgba(244, 211, 94, 0.2);
-          color: #0d3b66;
+          box-shadow: 0 0 15px rgba(var(--primary-rgb), 0.2);
+          color: var(--bg-deep);
         }
 
         /* Responsive Grid: Masonry visual layout via CSS Grid */
@@ -326,7 +325,7 @@ export default function Gallery({ images, loading, onSelectImage }) {
           width: 100%;
           aspect-ratio: 4/3;
           flex-shrink: 0;
-          background: #071d33;
+          background: var(--ink-black);
           overflow: hidden;
           border-radius: 15px 15px 0 0;
         }
@@ -356,7 +355,7 @@ export default function Gallery({ images, loading, onSelectImage }) {
           position: absolute;
           top: 1rem;
           left: 1rem;
-          background: rgba(13, 59, 102, 0.7);
+          background: rgba(0, 95, 115, 0.7);
           backdrop-filter: blur(8px);
           -webkit-backdrop-filter: blur(8px);
           border: 1px solid rgba(255, 255, 255, 0.08);
@@ -371,7 +370,7 @@ export default function Gallery({ images, loading, onSelectImage }) {
         .card-overlay {
           position: absolute;
           inset: 0;
-          background: linear-gradient(to top, rgba(13, 59, 102, 0.85) 0%, transparent 60%);
+          background: linear-gradient(to top, rgba(0, 95, 115, 0.85) 0%, transparent 60%);
           display: flex;
           align-items: flex-end;
           justify-content: flex-start;
@@ -392,7 +391,7 @@ export default function Gallery({ images, loading, onSelectImage }) {
           backdrop-filter: blur(4px);
           -webkit-backdrop-filter: blur(4px);
           border: 1px solid rgba(255, 255, 255, 0.15);
-          color: #fff;
+          color: var(--text-primary);
           padding: 0.4rem 0.85rem;
           border-radius: 6px;
           font-size: 0.75rem;
@@ -410,7 +409,7 @@ export default function Gallery({ images, loading, onSelectImage }) {
           display: flex;
           flex-direction: column;
           flex-grow: 1;
-          background: rgba(13, 50, 90, 0.3);
+          background: rgba(0, 95, 115, 0.3);
           border-radius: 0 0 15px 15px;
         }
 
