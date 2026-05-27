@@ -152,15 +152,19 @@ export default function IntroScreen({ onComplete }) {
     const rect = board.getBoundingClientRect();
     const cx   = rect.left + rect.width  / 2;
     const cy   = rect.top  + rect.height / 2;
-    const size = board.offsetWidth;
     const rad  = (-BOARD_DEG) * Math.PI / 180;
+    // Derive unrotated board size from the bounding rect for floating-point precision.
+    // For a square rotated by rad: boundingWidth = size * (|cos| + |sin|)
+    const size = rect.width / (Math.abs(Math.cos(rad)) + Math.abs(Math.sin(rad)));
     const relX = clientX - cx;
     const relY = clientY - cy;
-    const rx   =  relX * Math.cos(rad) + relY * Math.sin(rad);
-    const ry   = -relX * Math.sin(rad) + relY * Math.cos(rad);
+    const rx   =  relX * Math.cos(rad) - relY * Math.sin(rad);
+    const ry   =  relX * Math.sin(rad) + relY * Math.cos(rad);
+    // Cursor outside the rotated board — don't snap to an edge cell
+    if (Math.abs(rx) > size / 2 || Math.abs(ry) > size / 2) return null;
     return {
-      row: Math.max(0, Math.min(7, Math.floor((ry + size / 2) / (size / 8)))),
-      col: Math.max(0, Math.min(7, Math.floor((rx + size / 2) / (size / 8)))),
+      row: Math.floor((ry + size / 2) / (size / 8)),
+      col: Math.floor((rx + size / 2) / (size / 8)),
     };
   };
 
