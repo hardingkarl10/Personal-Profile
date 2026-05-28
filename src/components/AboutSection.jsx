@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Briefcase, GraduationCap, ChevronDown, ChevronUp, TrendingUp, MapPin, ExternalLink } from 'lucide-react';
+import { Briefcase, GraduationCap, TrendingUp, MapPin, ExternalLink, Code2 } from 'lucide-react';
 import heroPortrait from '../assets/hero.jpg';
+import SkillsPool from './SkillsPool';
 
 const EXPERIENCE = [
   {
@@ -84,19 +85,10 @@ const SKILL_GROUPS = [
   },
 ];
 
-const STATS = [
-  { value: '6+', label: 'Years Experience' },
-  { value: '4', label: 'Companies' },
-  { value: '12+', label: 'Countries Explored' },
-  { value: '40+', label: 'Board Games Owned' },
-];
-
 export default function AboutSection() {
-  const [expanded, setExpanded] = useState(0);
   const [reveal, setReveal] = useState(0);
   const introRef = useRef(null);
-
-  const toggle = (id) => setExpanded(expanded === id ? null : id);
+  const sectionRef = useRef(null);
 
   // Scroll-driven parallax: 0 when intro band is below the viewport,
   // 1 once it's well into view. Drives both the slide-in and a subtle drift.
@@ -122,8 +114,48 @@ export default function AboutSection() {
     };
   }, []);
 
+  // Scroll-progress reveal — each .reveal-on-scroll element gets its own
+  // --reveal CSS var (0 → 1) based on where it sits in the viewport.
+  // Matches the intro band's smooth scroll-linked feel.
+  useEffect(() => {
+    const root = sectionRef.current;
+    if (!root) return;
+    const targets = Array.from(root.querySelectorAll('.reveal-on-scroll'));
+
+    let ticking = false;
+    const update = () => {
+      ticking = false;
+      const vh = window.innerHeight || document.documentElement.clientHeight;
+      // Reveal begins when element top crosses the viewport bottom (vh),
+      // completes when it has scrolled up another 25% of viewport height
+      // (i.e., element top is 75% from the top of the viewport).
+      const startY = vh * 1.0;
+      const endY   = vh * 0.75;
+      const span   = startY - endY;
+      targets.forEach((el) => {
+        const top = el.getBoundingClientRect().top;
+        const p = Math.max(0, Math.min(1, (startY - top) / span));
+        el.style.setProperty('--reveal', p);
+      });
+    };
+
+    const onScroll = () => {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(update);
+    };
+
+    update();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', update);
+    return () => {
+      window.removeEventListener('scroll', onScroll);
+      window.removeEventListener('resize', update);
+    };
+  }, []);
+
   return (
-    <section id="about" className="about-section container">
+    <section ref={sectionRef} id="about" className="about-section container">
 
       {/* Parallax intro band — photo slides in from left, copy from right */}
       <div
@@ -155,90 +187,61 @@ export default function AboutSection() {
         </div>
       </div>
 
-      <div className="about-body">
+      {/* Skills — floating pool with light physics */}
+      <div className="skills-prominent reveal-on-scroll reveal-up">
+        <div className="block-heading">
+          <Code2 size={18} className="block-heading-icon" />
+          <span className="block-heading-text">Skills</span>
+        </div>
 
-        {/* Left: Experience Timeline */}
-        <div className="timeline-col">
-          <div className="col-heading">
-            <Briefcase size={16} className="col-icon" />
-            <span>Experience</span>
+        <SkillsPool skillGroups={SKILL_GROUPS} />
+      </div>
+
+      {/* Career rail — compact, anchored by years */}
+      <div className="career-section">
+        <div className="career-header reveal-on-scroll reveal-up">
+          <div className="block-heading">
+            <Briefcase size={18} className="block-heading-icon" />
+            <span className="block-heading-text">Experience</span>
           </div>
-
-          <div className="timeline">
-            {EXPERIENCE.map((job) => (
-              <div key={job.id} className={`timeline-entry accent-${job.accent}`}>
-                <div className="timeline-dot" />
-                <div className="timeline-card glass-card">
-                  <button className="timeline-header" onClick={() => toggle(job.id)}>
-                    <div className="timeline-meta">
-                      <span className={`job-tag tag-${job.accent}`}>{job.tag}</span>
-                      <span className="job-period">{job.period}</span>
-                    </div>
-                    <div className="timeline-titles">
-                      <span className="job-role">{job.role}</span>
-                      <span className="job-company">{job.company}</span>
-                    </div>
-                    <div className="timeline-footer-row">
-                      <span className={`highlight-chip chip-${job.accent}`}>
-                        <TrendingUp size={11} /> {job.highlight}
-                      </span>
-                      <span className="expand-icon">
-                        {expanded === job.id ? <ChevronUp size={15} /> : <ChevronDown size={15} />}
-                      </span>
-                    </div>
-                  </button>
-
-                  <ul className={`timeline-bullets ${expanded === job.id ? 'bullets-open' : ''}`}>
-                    {job.bullets.map((b, i) => (
-                      <li key={i} style={{ transitionDelay: expanded === job.id ? `${i * 0.07}s` : '0s' }}>
-                        <span className={`bullet-dot dot-${job.accent}`} />
-                        {b}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              </div>
-            ))}
+          <div className="career-stat">
+            <span className="career-stat-num">6+</span>
+            <span className="career-stat-lbl">years in software<br/>· 4 roles · still shipping</span>
           </div>
         </div>
 
-        {/* Right: Skills + Education */}
-        <div className="sidebar-col">
-
-          {/* Skills */}
-          <div className="skills-block">
-            <div className="col-heading">
-              <span className="col-icon">{'</>'}</span>
-              <span>Skills</span>
-            </div>
-
-            {SKILL_GROUPS.map((group) => (
-              <div key={group.label} className="skill-group">
-                <span className={`skill-group-label label-${group.accent}`}>{group.label}</span>
-                <div className="skill-pills">
-                  {group.skills.map((s) => (
-                    <span key={s} className={`skill-pill pill-${group.accent}`}>{s}</span>
-                  ))}
-                </div>
+        <div className="career-rail">
+          {EXPERIENCE.map((job) => (
+            <div
+              key={job.id}
+              className={`career-row accent-${job.accent} reveal-on-scroll reveal-right`}
+            >
+              <div className="career-dot" />
+              <div className="career-period">{job.period}</div>
+              <div className="career-main">
+                <span className="career-role">{job.role}</span>
+                <span className="career-company">{job.company}</span>
               </div>
-            ))}
-          </div>
-
-          {/* Education */}
-          <div className="edu-block glass-card">
-            <div className="edu-header">
-              <div className="edu-icon-wrap">
-                <GraduationCap size={20} />
-              </div>
-              <div>
-                <span className="edu-degree">BS, Computer Engineering</span>
-                <span className="edu-school">University of Nebraska–Lincoln</span>
+              <div className="career-highlight">
+                <TrendingUp size={12} /> {job.highlight}
               </div>
             </div>
-            <span className="edu-period">Aug 2015 – May 2019 · Omaha, NE</span>
-          </div>
-
+          ))}
         </div>
+      </div>
+
+      {/* Education — small tag below */}
+      <div className="edu-block glass-card reveal-on-scroll reveal-up">
+        <div className="edu-header">
+          <div className="edu-icon-wrap">
+            <GraduationCap size={20} />
+          </div>
+          <div>
+            <span className="edu-degree">BS, Computer Engineering</span>
+            <span className="edu-school">University of Nebraska–Lincoln</span>
+          </div>
+        </div>
+        <span className="edu-period">Aug 2015 – May 2019 · Omaha, NE</span>
       </div>
 
       <style>{`
@@ -331,6 +334,41 @@ export default function AboutSection() {
           .intro-photo-outline { animation: none; }
         }
 
+        /* Reveal-on-scroll — scroll-progress driven so the slide-in actually
+           tracks the user's scroll position, matching the intro band's feel. */
+        .reveal-on-scroll {
+          opacity: var(--reveal, 0);
+          will-change: opacity, transform;
+        }
+
+        .reveal-right {
+          transform: translate3d(calc((1 - var(--reveal, 0)) * 60px), 0, 0);
+        }
+        .reveal-up {
+          transform: translate3d(0, calc((1 - var(--reveal, 0)) * 28px), 0);
+        }
+
+        /* Career dot scales in alongside its row's reveal progress */
+        .career-row.reveal-on-scroll .career-dot {
+          transform: scale(var(--reveal, 0));
+        }
+
+        @media (max-width: 820px) {
+          /* On mobile the body is single-column; soften the horizontal slide */
+          .reveal-right {
+            transform: translate3d(calc((1 - var(--reveal, 0)) * 30px),
+                                   calc((1 - var(--reveal, 0)) * 12px), 0);
+          }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+          .reveal-on-scroll,
+          .career-row.reveal-on-scroll .career-dot {
+            opacity: 1;
+            transform: none;
+          }
+        }
+
         .intro-copy {
           /* Slide in from the right */
           transform: translate3d(calc((1 - var(--reveal, 0)) * 80px), 0, 0);
@@ -401,292 +439,52 @@ export default function AboutSection() {
           background: rgba(var(--primary-rgb), 0.08);
         }
 
-        /* Body layout */
-        .about-body {
-          display: grid;
-          grid-template-columns: 1.1fr 0.9fr;
-          gap: 3rem;
-          margin-bottom: 3rem;
-          align-items: start;
-        }
-
-        @media (max-width: 900px) {
-          .about-body {
-            grid-template-columns: 1fr;
-            gap: 2.5rem;
-          }
-        }
-
-        /* Column headings */
-        .col-heading {
+        /* Shared block heading (replaces the old .col-heading) */
+        .block-heading {
           display: flex;
           align-items: center;
           gap: 0.6rem;
           font-family: var(--font-display);
           font-weight: 700;
-          font-size: 0.8rem;
+          font-size: 0.85rem;
           text-transform: uppercase;
-          letter-spacing: 0.1em;
+          letter-spacing: 0.14em;
           color: var(--text-muted);
+        }
+
+        .block-heading-icon { color: var(--primary); }
+        .block-heading-text { color: var(--text-secondary); }
+
+        /* ── Skills — promoted to the dominant block ─────────────────────── */
+        .skills-prominent {
+          margin-bottom: 4rem;
+          padding: 2rem 2.25rem;
+          border-radius: 18px;
+          background: linear-gradient(
+            135deg,
+            rgba(var(--primary-rgb), 0.04) 0%,
+            rgba(var(--secondary-rgb), 0.03) 100%
+          );
+          border: 1px solid rgba(var(--primary-rgb), 0.12);
+        }
+
+        @media (max-width: 820px) {
+          .skills-prominent { padding: 1.5rem 1.25rem; }
+        }
+
+        .skills-prominent .block-heading {
           margin-bottom: 1.5rem;
         }
 
-        .col-icon {
-          color: var(--primary);
-          font-size: 1rem;
-        }
-
-        /* Timeline */
-        .timeline {
-          position: relative;
-          display: flex;
-          flex-direction: column;
-          gap: 0;
-        }
-
-        .timeline::before {
-          content: '';
-          position: absolute;
-          left: 10px;
-          top: 12px;
-          bottom: 12px;
-          width: 1px;
-          background: linear-gradient(to bottom, var(--primary), var(--secondary), var(--accent), transparent);
-          opacity: 0.3;
-        }
-
-        .timeline-entry {
-          display: flex;
-          gap: 1.25rem;
-          padding-bottom: 1.25rem;
-          position: relative;
-        }
-
-        .timeline-dot {
-          flex-shrink: 0;
-          width: 21px;
-          height: 21px;
-          border-radius: 50%;
-          margin-top: 14px;
-          position: relative;
-          z-index: 1;
-          border: 2px solid currentColor;
-          background: var(--bg-deep);
-        }
-
-        .accent-gold .timeline-dot { color: var(--primary); box-shadow: 0 0 10px rgba(var(--primary-rgb), 0.4); }
-        .accent-orange .timeline-dot { color: var(--secondary); box-shadow: 0 0 8px rgba(var(--secondary-rgb), 0.3); }
-        .accent-red .timeline-dot { color: var(--accent); box-shadow: 0 0 8px rgba(var(--accent-rgb), 0.3); }
-        .accent-muted .timeline-dot { color: var(--text-muted); }
-
-        /* Pulse on current role */
-        .accent-gold .timeline-dot::after {
-          content: '';
-          position: absolute;
-          inset: -5px;
-          border-radius: 50%;
-          border: 1px solid var(--primary);
-          opacity: 0.4;
-          animation: pulse-ring 2s ease-out infinite;
-        }
-
-        @keyframes pulse-ring {
-          0% { transform: scale(0.85); opacity: 0.5; }
-          100% { transform: scale(1.5); opacity: 0; }
-        }
-
-        .timeline-card {
-          flex: 1;
-          border-color: var(--border-light);
-          overflow: hidden;
-          border-radius: 12px;
-        }
-
-        .timeline-header {
-          width: 100%;
-          background: none;
-          border: none;
-          padding: 1rem 1.25rem;
-          cursor: pointer;
-          display: flex;
-          flex-direction: column;
-          gap: 0.4rem;
-          text-align: left;
-        }
-
-        .timeline-meta {
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          gap: 0.5rem;
-        }
-
-        .job-tag {
-          font-size: 0.7rem;
-          font-weight: 700;
-          text-transform: uppercase;
-          letter-spacing: 0.08em;
-          padding: 0.15rem 0.6rem;
-          border-radius: 9999px;
-        }
-
-        .tag-gold { background: rgba(var(--primary-rgb), 0.15); color: var(--primary); }
-        .tag-orange { background: rgba(var(--secondary-rgb), 0.15); color: var(--secondary); }
-        .tag-red { background: rgba(var(--accent-rgb), 0.15); color: var(--accent); }
-        .tag-muted { background: rgba(var(--text-primary-rgb), 0.06); color: var(--text-muted); }
-
-        .job-period {
-          font-size: 0.75rem;
-          color: var(--text-muted);
-        }
-
-        .timeline-titles {
-          display: flex;
-          flex-direction: column;
-          gap: 0.1rem;
-        }
-
-        .job-role {
-          font-family: var(--font-display);
-          font-weight: 700;
-          font-size: 1rem;
-          color: var(--text-primary);
-        }
-
-        .job-company {
-          font-size: 0.85rem;
-          color: var(--text-secondary);
-          font-weight: 500;
-        }
-
-        .timeline-footer-row {
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          margin-top: 0.25rem;
-        }
-
-        .highlight-chip {
-          display: inline-flex;
-          align-items: center;
-          gap: 0.3rem;
-          font-size: 0.72rem;
-          font-weight: 600;
-          padding: 0.2rem 0.6rem;
-          border-radius: 9999px;
-        }
-
-        .chip-gold { background: rgba(var(--primary-rgb), 0.1); color: var(--primary); }
-        .chip-orange { background: rgba(var(--secondary-rgb), 0.1); color: var(--secondary); }
-        .chip-red { background: rgba(var(--accent-rgb), 0.1); color: var(--accent); }
-        .chip-muted { background: rgba(var(--text-primary-rgb), 0.05); color: var(--text-muted); }
-
-        .expand-icon {
-          color: var(--text-muted);
-          display: flex;
-          align-items: center;
-        }
-
-        .timeline-bullets {
-          list-style: none;
-          padding: 0 1.25rem;
-          display: flex;
-          flex-direction: column;
-          gap: 0.65rem;
-          border-top: 0px solid var(--border-light);
-          margin-top: 0;
-          max-height: 0;
-          overflow: hidden;
-          opacity: 0;
-          transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1),
-                      opacity 0.3s ease,
-                      padding 0.3s ease,
-                      border-top-width 0.3s ease;
-        }
-
-        .timeline-bullets.bullets-open {
-          max-height: 400px;
-          opacity: 1;
-          padding: 1rem 1.25rem 1.25rem;
-          border-top-width: 1px;
-        }
-
-        .timeline-bullets li {
-          display: flex;
-          gap: 0.6rem;
-          font-size: 0.85rem;
-          color: var(--text-secondary);
-          line-height: 1.5;
-          align-items: flex-start;
-          opacity: 0;
-          transform: translateY(6px);
-          transition: opacity 0.25s ease, transform 0.25s ease;
-        }
-
-        .timeline-bullets.bullets-open li {
-          opacity: 1;
-          transform: translateY(0);
-          transition-delay: 0s;
-        }
-
-        .bullet-dot {
-          flex-shrink: 0;
-          width: 5px;
-          height: 5px;
-          border-radius: 50%;
-          margin-top: 6px;
-        }
-
-        .dot-gold { background: var(--primary); }
-        .dot-orange { background: var(--secondary); }
-        .dot-red { background: var(--accent); }
-        .dot-muted { background: var(--text-muted); }
-
-        /* Sidebar */
-        .sidebar-col {
-          display: flex;
-          flex-direction: column;
-          gap: 2rem;
-        }
-
-        /* Skills */
-        .skills-block {
-          display: flex;
-          flex-direction: column;
-          gap: 1.25rem;
-        }
-
-        .skill-group {
-          display: flex;
-          flex-direction: column;
-          gap: 0.5rem;
-        }
-
-        .skill-group-label {
-          font-size: 0.7rem;
-          font-weight: 700;
-          text-transform: uppercase;
-          letter-spacing: 0.1em;
-        }
-
-        .label-gold { color: var(--primary); }
-        .label-orange { color: var(--secondary); }
-        .label-red { color: var(--accent); }
-        .label-muted { color: var(--text-muted); }
-
-        .skill-pills {
-          display: flex;
-          flex-wrap: wrap;
-          gap: 0.4rem;
-        }
-
+        /* Base pill styling — inherited by the floating pool's .pool-pill */
         .skill-pill {
-          font-size: 0.8rem;
-          font-weight: 500;
-          padding: 0.3rem 0.75rem;
+          font-size: 0.88rem;
+          font-weight: 600;
+          padding: 0.45rem 1rem;
           border-radius: 9999px;
           border: 1px solid transparent;
           transition: var(--transition-fast);
+          cursor: default;
         }
 
         .pill-gold {
@@ -716,6 +514,145 @@ export default function AboutSection() {
           color: var(--text-secondary);
         }
         .pill-muted:hover { background: rgba(var(--text-primary-rgb), 0.08); }
+
+        /* ── Career rail — compact, anchored by years ─────────────────── */
+        .career-section { margin-bottom: 2.5rem; }
+
+        .career-header {
+          display: flex;
+          align-items: flex-end;
+          justify-content: space-between;
+          gap: 1.5rem;
+          margin-bottom: 1.75rem;
+          flex-wrap: wrap;
+        }
+
+        .career-stat {
+          display: flex;
+          align-items: baseline;
+          gap: 0.75rem;
+        }
+
+        .career-stat-num {
+          font-family: var(--font-display);
+          font-size: clamp(2.5rem, 5vw, 3.6rem);
+          font-weight: 800;
+          line-height: 1;
+          background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+        }
+
+        .career-stat-lbl {
+          font-size: 0.72rem;
+          letter-spacing: 0.14em;
+          text-transform: uppercase;
+          color: var(--text-muted);
+          line-height: 1.4;
+        }
+
+        .career-rail {
+          position: relative;
+          display: flex;
+          flex-direction: column;
+          gap: 0.25rem;
+        }
+
+        .career-rail::before {
+          content: '';
+          position: absolute;
+          left: 7px;
+          top: 14px;
+          bottom: 14px;
+          width: 1px;
+          background: linear-gradient(to bottom, var(--primary), var(--secondary), var(--accent), transparent);
+          opacity: 0.35;
+        }
+
+        .career-row {
+          display: grid;
+          grid-template-columns: 16px 130px 1fr auto;
+          gap: 1.25rem;
+          align-items: center;
+          padding: 0.9rem 0;
+          border-bottom: 1px solid var(--border-light);
+          position: relative;
+        }
+
+        .career-row:last-child { border-bottom: none; }
+
+        @media (max-width: 720px) {
+          .career-row {
+            grid-template-columns: 16px 1fr;
+            row-gap: 0.35rem;
+            column-gap: 1rem;
+          }
+          .career-period   { grid-column: 2; order: 1; }
+          .career-main     { grid-column: 2; order: 2; }
+          .career-highlight{ grid-column: 2; order: 3; }
+        }
+
+        .career-dot {
+          width: 15px;
+          height: 15px;
+          border-radius: 50%;
+          border: 2px solid currentColor;
+          background: var(--bg-deep);
+          position: relative;
+          z-index: 1;
+        }
+
+        .accent-gold .career-dot   { color: var(--primary);    box-shadow: 0 0 10px rgba(var(--primary-rgb), 0.4); }
+        .accent-orange .career-dot { color: var(--secondary);  box-shadow: 0 0 8px rgba(var(--secondary-rgb), 0.3); }
+        .accent-red .career-dot    { color: var(--accent);     box-shadow: 0 0 8px rgba(var(--accent-rgb), 0.3); }
+        .accent-muted .career-dot  { color: var(--text-muted); }
+
+        /* Pulse on the current role */
+        .accent-gold .career-dot::after {
+          content: '';
+          position: absolute;
+          inset: -5px;
+          border-radius: 50%;
+          border: 1px solid var(--primary);
+          opacity: 0.4;
+          animation: pulse-ring 2s ease-out infinite;
+        }
+        @keyframes pulse-ring {
+          0%   { transform: scale(0.85); opacity: 0.5; }
+          100% { transform: scale(1.5);  opacity: 0;   }
+        }
+
+        .career-period {
+          font-size: 0.78rem;
+          color: var(--text-muted);
+          font-variant-numeric: tabular-nums;
+          letter-spacing: 0.02em;
+        }
+
+        .career-main { display: flex; flex-direction: column; gap: 0.1rem; }
+
+        .career-role {
+          font-family: var(--font-display);
+          font-weight: 700;
+          font-size: 1rem;
+          color: var(--text-primary);
+        }
+
+        .career-company {
+          font-size: 0.82rem;
+          color: var(--text-secondary);
+        }
+
+        .career-highlight {
+          display: inline-flex;
+          align-items: center;
+          gap: 0.35rem;
+          font-size: 0.78rem;
+          color: var(--text-muted);
+          white-space: nowrap;
+        }
+
+        .career-highlight svg { color: var(--primary); }
 
         /* Education */
         .edu-block {
@@ -763,56 +700,6 @@ export default function AboutSection() {
           font-size: 0.75rem;
           color: var(--text-muted);
           padding-left: 0.25rem;
-        }
-
-        /* Stats bar */
-        .stats-bar {
-          display: grid;
-          grid-template-columns: repeat(4, 1fr) repeat(3, auto);
-          align-items: center;
-          padding: 2rem 3rem;
-          border-color: rgba(var(--primary-rgb), 0.12);
-          background: rgba(18, 69, 89, 0.5);
-        }
-
-        @media (max-width: 768px) {
-          .stats-bar {
-            grid-template-columns: 1fr 1fr;
-            gap: 1.5rem;
-            padding: 1.75rem;
-          }
-          .stat-divider { display: none; }
-        }
-
-        .stat-block {
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          gap: 0.35rem;
-          text-align: center;
-        }
-
-        .stat-val {
-          font-family: var(--font-display);
-          font-size: 2.25rem;
-          font-weight: 800;
-          line-height: 1;
-          background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
-          -webkit-background-clip: text;
-          -webkit-text-fill-color: transparent;
-        }
-
-        .stat-lbl {
-          font-size: 0.75rem;
-          color: var(--text-muted);
-          text-transform: uppercase;
-          letter-spacing: 0.06em;
-        }
-
-        .stat-divider {
-          width: 1px;
-          height: 44px;
-          background: var(--border-light);
         }
       `}</style>
     </section>
