@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { Layers, User, Calendar, ExternalLink, SlidersHorizontal, Info } from 'lucide-react';
+import { Layers, User, Calendar, ExternalLink, SlidersHorizontal, Info, Trash2 } from 'lucide-react';
 
-export default function Gallery({ images, loading, onSelectImage }) {
+export default function Gallery({ images, loading, onSelectImage, authorized, onDeleteImage }) {
   const [activeCategory, setActiveCategory] = useState('All');
   const [loadedImages, setLoadedImages] = useState({});
 
@@ -101,7 +101,22 @@ export default function Gallery({ images, loading, onSelectImage }) {
                   
                   {/* Category Badge on hover overlay */}
                   <span className="card-badge">{image.category}</span>
-                  
+
+                  {/* Admin delete button — only when signed in as authorized owner */}
+                  {authorized && (
+                    <button
+                      type="button"
+                      className="card-delete-btn"
+                      title="Delete image"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onDeleteImage?.(image);
+                      }}
+                    >
+                      <Trash2 size={14} />
+                    </button>
+                  )}
+
                   {/* Hover visual details */}
                   <div className="card-overlay">
                     <span className="btn-expand">
@@ -349,6 +364,40 @@ export default function Gallery({ images, loading, onSelectImage }) {
 
         .gallery-card:hover .gallery-img {
           transform: scale(1.06);
+        }
+
+        .card-delete-btn {
+          position: absolute;
+          top: 0.75rem;
+          right: 0.75rem;
+          z-index: 6;
+          width: 32px;
+          height: 32px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          background: rgba(0, 18, 25, 0.65);
+          backdrop-filter: blur(8px);
+          -webkit-backdrop-filter: blur(8px);
+          border: 1px solid rgba(255, 255, 255, 0.1);
+          border-radius: 50%;
+          color: var(--text-primary);
+          cursor: pointer;
+          opacity: 0;
+          transform: translateY(-4px);
+          transition: var(--transition-fast);
+        }
+
+        .gallery-card:hover .card-delete-btn {
+          opacity: 1;
+          transform: translateY(0);
+        }
+
+        .card-delete-btn:hover {
+          background: rgba(var(--error-rgb, 239, 68, 68), 0.85);
+          border-color: var(--error-light, #f87171);
+          color: #fff;
+          transform: scale(1.05);
         }
 
         .card-badge {

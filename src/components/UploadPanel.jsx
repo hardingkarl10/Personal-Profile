@@ -1,6 +1,7 @@
-import React, { useState, useRef } from 'react';
-import { CloudUpload, Lock, CheckCircle2, AlertCircle, X, Image as ImageIcon, Sparkles } from 'lucide-react';
+import React, { useState, useRef, useEffect } from 'react';
+import { CloudUpload, LogIn, LogOut, CheckCircle2, AlertCircle, X, Image as ImageIcon, Sparkles, ShieldAlert } from 'lucide-react';
 import { uploadGalleryImage } from '../services/storage';
+import { signInWithGoogle, signOut, onAuthChange, isAuthorized, AUTHORIZED_EMAIL } from '../services/auth';
 
 export default function UploadPanel({ isOpen, onClose, onUploadSuccess }) {
   const [file, setFile] = useState(null);
@@ -10,8 +11,10 @@ export default function UploadPanel({ isOpen, onClose, onUploadSuccess }) {
   const [aspectRatio, setAspectRatio] = useState('wide');
   const [description, setDescription] = useState('');
 
-  // Passcode Check states
-  const [passcode, setPasscode] = useState('');
+  // Auth state
+  const [user, setUser] = useState(null);
+  const [authLoading, setAuthLoading] = useState(true);
+  const [signingIn, setSigningIn] = useState(false);
 
   // Status states
   const [uploading, setUploading] = useState(false);
@@ -19,8 +22,37 @@ export default function UploadPanel({ isOpen, onClose, onUploadSuccess }) {
 
   const fileInputRef = useRef(null);
 
-  // Read passcode from env or default to karl-admin
-  const EXPECTED_PASSCODE = import.meta.env.VITE_ADMIN_PASSCODE || 'karl-admin';
+  useEffect(() => {
+    const unsubscribe = onAuthChange((u) => {
+      setUser(u);
+      setAuthLoading(false);
+    });
+    return unsubscribe;
+  }, []);
+
+  const handleSignIn = async () => {
+    setSigningIn(true);
+    setStatus({ type: '', message: '' });
+    try {
+      await signInWithGoogle();
+    } catch (err) {
+      console.error(err);
+      setStatus({ type: 'error', message: 'Sign-in failed. Please try again.' });
+    } finally {
+      setSigningIn(false);
+    }
+  };
+
+  const handleSignOut = async () => {
+    try {
+      await signOut();
+      setStatus({ type: '', message: '' });
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const authorized = isAuthorized(user);
 
   const handleFileChange = (e) => {
     const selectedFile = e.target.files[0];
@@ -52,18 +84,16 @@ export default function UploadPanel({ isOpen, onClose, onUploadSuccess }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    if (!authorized) {
+      setStatus({ type: 'error', message: 'You must be signed in as the admin to upload.' });
+      return;
+    }
     if (!file) {
       setStatus({ type: 'error', message: 'Please select an image file.' });
       return;
     }
     if (!title.trim()) {
       setStatus({ type: 'error', message: 'Please enter a title.' });
-      return;
-    }
-
-    // Passcode Verification Gate
-    if (passcode !== EXPECTED_PASSCODE) {
-      setStatus({ type: 'error', message: 'Invalid Admin Passcode. Upload blocked.' });
       return;
     }
 
@@ -137,6 +167,42 @@ export default function UploadPanel({ isOpen, onClose, onUploadSuccess }) {
           </div>
         )}
 
+        {authLoading ? (
+          <div className="auth-gate">
+            <div className="spinner" />
+            <p>Checking sign-in…</p>
+          </div>
+        ) : !user ? (
+          <div className="auth-gate">
+            <ShieldAlert className="gate-icon" size={32} />
+            <h4>Admin sign-in required</h4>
+            <p>Uploads are restricted to the site owner. Sign in with Google to continue.</p>
+            <button
+              type="button"
+              className="btn-glow btn-submit"
+              onClick={handleSignIn}
+              disabled={signingIn}
+            >
+              {signingIn ? (
+                <><div className="spinner" /> Opening Google…</>
+              ) : (
+                <><LogIn size={16} /> Sign in with Google</>
+              )}
+            </button>
+          </div>
+        ) : !authorized ? (
+          <div className="auth-gate">
+            <ShieldAlert className="gate-icon error" size={32} />
+            <h4>Not authorized</h4>
+            <p>
+              You're signed in as <strong>{user.email}</strong>, but uploads are restricted
+              to <strong>{AUTHORIZED_EMAIL}</strong>.
+            </p>
+            <button type="button" className="btn-cancel" onClick={handleSignOut}>
+              <LogOut size={14} /> Sign out
+            </button>
+          </div>
+        ) : (
         <form onSubmit={handleSubmit} className="drawer-form">
           <div className="form-grid">
 
@@ -228,22 +294,22 @@ export default function UploadPanel({ isOpen, onClose, onUploadSuccess }) {
                 />
               </div>
 
-              {/* Passcode Authorization check */}
-              <div className="input-group passcode-group">
+              {/* Signed-in admin badge */}
+              <div className="input-group auth-group">
                 <label className="lock-label">
-                  <Lock size={12} className="lock-icon" /> Admin Passcode
+                  <CheckCircle2 size={12} className="lock-icon" /> Signed in
                 </label>
-                <input
-                  type="password"
-                  placeholder="Enter passcode to authorize upload..."
-                  value={passcode}
-                  onChange={(e) => setPasscode(e.target.value)}
-                  disabled={uploading}
-                  required
-                />
-                <span className="passcode-hint">
-                  Default developer local passcode is: <code>karl-admin</code>
-                </span>
+                <div className="auth-row">
+                  <span className="auth-email">{user?.email}</span>
+                  <button
+                    type="button"
+                    className="btn-text"
+                    onClick={handleSignOut}
+                    disabled={uploading}
+                  >
+                    <LogOut size={12} /> Sign out
+                  </button>
+                </div>
               </div>
             </div>
           </div>
@@ -274,6 +340,7 @@ export default function UploadPanel({ isOpen, onClose, onUploadSuccess }) {
             </button>
           </div>
         </form>
+        )}
 
       </div>
 
@@ -541,8 +608,8 @@ export default function UploadPanel({ isOpen, onClose, onUploadSuccess }) {
           box-shadow: 0 0 10px rgba(var(--primary-rgb), 0.15);
         }
 
-        /* Passcode section */
-        .passcode-group {
+        /* Signed-in badge */
+        .auth-group {
           background: rgba(var(--accent-rgb), 0.03);
           border: 1px solid rgba(var(--accent-rgb), 0.08);
           padding: 0.85rem;
@@ -561,17 +628,71 @@ export default function UploadPanel({ isOpen, onClose, onUploadSuccess }) {
           color: var(--accent);
         }
 
-        .passcode-hint {
-          font-size: 0.7rem;
-          color: var(--text-muted);
-          margin-top: 0.25rem;
+        .auth-row {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          gap: 0.5rem;
         }
 
-        .passcode-hint code {
-          background: rgba(255, 255, 255, 0.04);
-          padding: 0.1rem 0.3rem;
-          border-radius: 3px;
-          color: var(--accent);
+        .auth-email {
+          font-size: 0.85rem;
+          color: var(--text-primary);
+          font-family: var(--font-mono, monospace);
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+
+        .btn-text {
+          background: transparent;
+          border: none;
+          color: var(--text-muted);
+          font-size: 0.75rem;
+          cursor: pointer;
+          display: inline-flex;
+          align-items: center;
+          gap: 0.25rem;
+          padding: 0.25rem 0.5rem;
+          border-radius: 6px;
+          transition: var(--transition-fast);
+        }
+
+        .btn-text:hover {
+          color: var(--text-primary);
+          background: rgba(255, 255, 255, 0.05);
+        }
+
+        /* Auth gate (sign-in / wrong-account screens) */
+        .auth-gate {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          text-align: center;
+          padding: 3rem 1.5rem;
+          gap: 0.75rem;
+        }
+
+        .auth-gate h4 {
+          font-size: 1.05rem;
+          color: var(--text-primary);
+          margin: 0;
+        }
+
+        .auth-gate p {
+          font-size: 0.85rem;
+          color: var(--text-muted);
+          max-width: 380px;
+          margin: 0 0 0.5rem;
+        }
+
+        .auth-gate .gate-icon {
+          color: var(--primary);
+          margin-bottom: 0.25rem;
+        }
+
+        .auth-gate .gate-icon.error {
+          color: var(--error-light, #f87171);
         }
 
         /* Actions */

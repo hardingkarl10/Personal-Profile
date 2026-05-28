@@ -1,7 +1,7 @@
 import React from 'react';
-import { Compass } from 'lucide-react';
+import { Compass, LogIn } from 'lucide-react';
 
-export default function Header({ onOpenUpload, onNavigateGame }) {
+export default function Header({ authorized, signingIn, onLogin, onOpenUpload, onNavigateGame }) {
   return (
     <header className="header-glass">
       <div className="header-container">
@@ -42,12 +42,23 @@ export default function Header({ onOpenUpload, onNavigateGame }) {
               <circle cx="4" cy="4" r="2"></circle>
             </svg>
           </a>
-          <button
-            onClick={onOpenUpload}
-            className="btn-header-action"
-          >
-            Upload
-          </button>
+          {authorized ? (
+            <button
+              onClick={onOpenUpload}
+              className="btn-header-action"
+            >
+              Upload
+            </button>
+          ) : (
+            <button
+              onClick={onLogin}
+              disabled={signingIn}
+              className="btn-header-action"
+            >
+              <LogIn size={14} style={{ marginRight: '0.4rem' }} />
+              {signingIn ? 'Signing in…' : 'Login'}
+            </button>
+          )}
         </div>
       </div>
 

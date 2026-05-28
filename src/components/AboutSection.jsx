@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Briefcase, GraduationCap, ChevronDown, ChevronUp, TrendingUp, MapPin, ExternalLink } from 'lucide-react';
+import heroPortrait from '../assets/hero.jpg';
 
 const EXPERIENCE = [
   {
@@ -92,26 +93,65 @@ const STATS = [
 
 export default function AboutSection() {
   const [expanded, setExpanded] = useState(0);
+  const [reveal, setReveal] = useState(0);
+  const introRef = useRef(null);
 
   const toggle = (id) => setExpanded(expanded === id ? null : id);
+
+  // Scroll-driven parallax: 0 when intro band is below the viewport,
+  // 1 once it's well into view. Drives both the slide-in and a subtle drift.
+  useEffect(() => {
+    const compute = () => {
+      const el = introRef.current;
+      if (!el) return;
+      const rect = el.getBoundingClientRect();
+      const vh = window.innerHeight || document.documentElement.clientHeight;
+      // Start the reveal when the band's top crosses 90% of the viewport,
+      // finish when it has scrolled up by another 55% of viewport height.
+      const start = vh * 0.9;
+      const span  = vh * 0.55;
+      const p = 1 - (rect.top - (start - span)) / span;
+      setReveal(Math.max(0, Math.min(1, p)));
+    };
+    compute();
+    window.addEventListener('scroll', compute, { passive: true });
+    window.addEventListener('resize', compute);
+    return () => {
+      window.removeEventListener('scroll', compute);
+      window.removeEventListener('resize', compute);
+    };
+  }, []);
 
   return (
     <section id="about" className="about-section container">
 
-      {/* Section Header */}
-      <div className="about-header">
-        <h2 className="about-title">About Me</h2>
-        <p className="about-subtitle">
-          Software engineer by trade, explorer by habit. I build high-performance systems at Buildertrend by day —
-          and chase new countries, shoot 35mm film on a Nikon FG20, and obsess over tabletop strategy games everywhere else.
-        </p>
-        <div className="contact-row">
-          <a href="https://www.linkedin.com/in/harding-karl" target="_blank" rel="noopener noreferrer" className="contact-chip">
-            <ExternalLink size={13} /> LinkedIn
-          </a>
-          <span className="contact-chip">
-            <MapPin size={13} /> Prairie Village, KS
-          </span>
+      {/* Parallax intro band — photo slides in from left, copy from right */}
+      <div
+        ref={introRef}
+        className="about-intro"
+        style={{ '--reveal': reveal }}
+      >
+        <div className="intro-photo">
+          <div className="intro-photo-outline" aria-hidden="true" />
+          <div className="intro-photo-frame">
+            <img src={heroPortrait} alt="Karl Harding" />
+          </div>
+        </div>
+
+        <div className="intro-copy">
+          <h2 className="about-title">About Me</h2>
+          <p className="about-subtitle">
+            Software engineer by trade, explorer by habit. I build high-performance systems at Buildertrend by day —
+            and chase new countries, shoot 35mm film on a Nikon FG20, and obsess over tabletop strategy games everywhere else.
+          </p>
+          <div className="contact-row">
+            <a href="https://www.linkedin.com/in/harding-karl" target="_blank" rel="noopener noreferrer" className="contact-chip">
+              <ExternalLink size={13} /> LinkedIn
+            </a>
+            <span className="contact-chip">
+              <MapPin size={13} /> Prairie Village, KS
+            </span>
+          </div>
         </div>
       </div>
 
@@ -207,16 +247,113 @@ export default function AboutSection() {
           padding-bottom: 6rem;
         }
 
-        /* Header */
-        .about-header {
-          max-width: 720px;
-          margin: 0 auto 4rem;
-          text-align: center;
+        /* Parallax intro band */
+        .about-intro {
+          display: grid;
+          grid-template-columns: minmax(260px, 380px) 1fr;
+          gap: 3.5rem;
+          align-items: center;
+          margin-bottom: 4.5rem;
+          /* --reveal is set inline from 0 → 1 as the band scrolls into view */
+        }
+
+        @media (max-width: 820px) {
+          .about-intro {
+            grid-template-columns: 1fr;
+            gap: 2rem;
+            text-align: center;
+            margin-bottom: 3.5rem;
+          }
+        }
+
+        .intro-photo {
+          position: relative;
+          aspect-ratio: 4 / 5;
+          width: 100%;
+          /* Slide in from the left, then a gentle continuing parallax drift */
+          transform: translate3d(calc((1 - var(--reveal, 0)) * -80px), 0, 0);
+          opacity: var(--reveal, 0);
+          transition: transform 0.25s ease-out, opacity 0.4s ease-out;
+          will-change: transform, opacity;
+        }
+
+        /* The actual photo, clipped to a soft organic blob */
+        .intro-photo-frame {
+          position: relative;
+          z-index: 1;
+          width: 100%;
+          height: 100%;
+          overflow: hidden;
+          border: 1px solid rgba(var(--primary-rgb), 0.22);
+          background: rgba(var(--text-primary-rgb), 0.03);
+          border-radius: 62% 38% 47% 53% / 45% 62% 38% 55%;
+          box-shadow:
+            0 30px 60px rgba(0, 0, 0, 0.35),
+            0 0 60px rgba(var(--primary-rgb), 0.08);
+          animation: blob-morph-a 18s ease-in-out infinite;
+        }
+
+        .intro-photo-frame img {
+          display: block;
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          /* Subtle Ken-Burns-style parallax against the slide-in */
+          transform: scale(1.05) translateY(calc((var(--reveal, 0) - 0.5) * -14px));
+          transition: transform 0.4s ease-out;
+        }
+
+        /* A second, slightly different organic shape behind — the "outline" */
+        .intro-photo-outline {
+          position: absolute;
+          inset: -18px -14px -14px -18px;
+          z-index: 0;
+          border: 1.5px solid rgba(var(--primary-rgb), 0.45);
+          border-radius: 55% 45% 35% 65% / 52% 64% 36% 48%;
+          pointer-events: none;
+          animation: blob-morph-b 22s ease-in-out infinite;
+        }
+
+        /* Slow morph so the shapes feel hand-drawn, not stamped */
+        @keyframes blob-morph-a {
+          0%, 100% { border-radius: 62% 38% 47% 53% / 45% 62% 38% 55%; }
+          33%      { border-radius: 56% 44% 58% 42% / 52% 48% 52% 48%; }
+          66%      { border-radius: 48% 52% 36% 64% / 60% 42% 58% 40%; }
+        }
+
+        @keyframes blob-morph-b {
+          0%, 100% { border-radius: 55% 45% 35% 65% / 52% 64% 36% 48%; transform: rotate(-3deg); }
+          50%      { border-radius: 45% 55% 60% 40% / 38% 52% 48% 62%; transform: rotate(3deg); }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+          .intro-photo-frame,
+          .intro-photo-outline { animation: none; }
+        }
+
+        .intro-copy {
+          /* Slide in from the right */
+          transform: translate3d(calc((1 - var(--reveal, 0)) * 80px), 0, 0);
+          opacity: var(--reveal, 0);
+          transition: transform 0.25s ease-out, opacity 0.4s ease-out;
+          will-change: transform, opacity;
+        }
+
+        @media (max-width: 820px) {
+          /* On mobile, both elements fade up together — no horizontal slide */
+          .intro-photo {
+            max-width: 320px;
+            margin: 0 auto;
+            transform: translate3d(0, calc((1 - var(--reveal, 0)) * 40px), 0);
+          }
+          .intro-copy {
+            transform: translate3d(0, calc((1 - var(--reveal, 0)) * 40px), 0);
+          }
         }
 
         .about-title {
           font-size: clamp(2rem, 4vw, 3rem);
-          margin-bottom: 1rem;
+          margin: 0 0 1rem;
           background: linear-gradient(135deg, var(--text-primary) 0%, var(--primary) 100%);
           -webkit-background-clip: text;
           -webkit-text-fill-color: transparent;
@@ -227,13 +364,21 @@ export default function AboutSection() {
           color: var(--text-secondary);
           line-height: 1.7;
           margin-bottom: 1.5rem;
+          max-width: 560px;
+        }
+
+        @media (max-width: 820px) {
+          .about-subtitle { margin-left: auto; margin-right: auto; }
         }
 
         .contact-row {
           display: flex;
           flex-wrap: wrap;
           gap: 0.75rem;
-          justify-content: center;
+        }
+
+        @media (max-width: 820px) {
+          .contact-row { justify-content: center; }
         }
 
         .contact-chip {

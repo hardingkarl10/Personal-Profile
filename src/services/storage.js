@@ -1,33 +1,10 @@
-import { initializeApp, getApps, getApp } from 'firebase/app';
-import { getStorage, ref, listAll, getDownloadURL, getMetadata, uploadBytes, updateMetadata } from 'firebase/storage';
+import { getStorage, ref, listAll, getDownloadURL, getMetadata, uploadBytes, updateMetadata, deleteObject } from 'firebase/storage';
+import { firebaseApp, isFirebaseConfigured } from './firebase';
 
-// Firebase configuration using Vite environment variables
-const firebaseConfig = {
-  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
-  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
-  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
-  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
-  appId: import.meta.env.VITE_FIREBASE_APP_ID,
-};
+const storage = firebaseApp ? getStorage(firebaseApp) : null;
 
-// Check if Firebase keys are fully set up
-const isFirebaseConfigured = !!(
-  firebaseConfig.apiKey &&
-  firebaseConfig.projectId &&
-  firebaseConfig.storageBucket
-);
-
-let storage = null;
-
-if (isFirebaseConfigured) {
-  try {
-    const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
-    storage = getStorage(app);
-    console.log('Successfully initialized Firebase Storage client.');
-  } catch (error) {
-    console.error('Failed to initialize Firebase app:', error);
-  }
+if (storage) {
+  console.log('Successfully initialized Firebase Storage client.');
 } else {
   console.log('Firebase credentials not detected. Operating in Local Mock Mode.');
 }
@@ -256,4 +233,22 @@ export const uploadGalleryImage = async (file, fields) => {
     aspectRatio: fields.aspectRatio,
     date: new Date().toISOString().split('T')[0]
   };
+};
+
+/**
+ * Deletes a gallery image from Firebase Storage by its full path id.
+ * Mock-mode ids (prefixed with "mock-") are treated as a no-op so the caller
+ * can still remove them from local state.
+ * @param {string} id - The fullPath used as the image id
+ */
+export const deleteGalleryImage = async (id) => {
+  if (!id) throw new Error('Missing image id');
+
+  if (id.startsWith('mock-') || !isFirebaseConfigured || !storage) {
+    await new Promise((resolve) => setTimeout(resolve, 300));
+    return;
+  }
+
+  const fileRef = ref(storage, id);
+  await deleteObject(fileRef);
 };

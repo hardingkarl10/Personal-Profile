@@ -10,7 +10,8 @@ import NavalGame from './components/NavalGame';
 import Footer from './components/Footer';
 import ChessBackground from './components/ChessBackground';
 import IntroScreen from './components/IntroScreen';
-import { getGalleryImages } from './services/storage';
+import { getGalleryImages, deleteGalleryImage } from './services/storage';
+import { onAuthChange, signInWithGoogle, isAuthorized } from './services/auth';
 import { CheckCircle2 } from 'lucide-react';
 
 export default function App() {
@@ -38,6 +39,25 @@ export default function App() {
   const [isUploadOpen, setIsUploadOpen] = useState(false);
   const [toast, setToast] = useState({ show: false, message: '' });
 
+  // Auth state (drives Login vs Upload button in header)
+  const [authUser, setAuthUser] = useState(null);
+  const [signingIn, setSigningIn] = useState(false);
+
+  useEffect(() => onAuthChange(setAuthUser), []);
+
+  const authorized = isAuthorized(authUser);
+
+  const handleLogin = async () => {
+    setSigningIn(true);
+    try {
+      await signInWithGoogle();
+    } catch (err) {
+      console.error('Sign-in failed', err);
+    } finally {
+      setSigningIn(false);
+    }
+  };
+
   // Fetch images on component mount
   useEffect(() => {
     let active = true;
@@ -45,7 +65,7 @@ export default function App() {
     async function loadData() {
       setLoading(true);
       try {
-        const data = await getGalleryImages();
+        const data = await getGalleryImages('gallery');
         if (active) {
           setImages(data);
         }
@@ -87,6 +107,23 @@ export default function App() {
     setIsUploadOpen(false);
   };
 
+  const handleDeleteImage = async (image) => {
+    if (!authorized) return;
+    const confirmed = window.confirm(`Delete "${image.title}"? This cannot be undone.`);
+    if (!confirmed) return;
+
+    try {
+      await deleteGalleryImage(image.id);
+      setImages((prev) => prev.filter((img) => img.id !== image.id));
+      setToast({ show: true, message: `Deleted "${image.title}".` });
+      setTimeout(() => setToast({ show: false, message: '' }), 4000);
+    } catch (err) {
+      console.error('Failed to delete image', err);
+      setToast({ show: true, message: `Failed to delete "${image.title}".` });
+      setTimeout(() => setToast({ show: false, message: '' }), 4000);
+    }
+  };
+
   const handleUploadSuccess = (newImage) => {
     // Add new image directly to top of gallery feed instantly
     setImages((prev) => [newImage, ...prev]);
@@ -117,10 +154,16 @@ export default function App() {
       <div className="glow-ambient glow-cyan" style={{ top: '35%', right: '5%' }}></div>
       
       {/* Navigation Header */}
-      <Header onOpenUpload={handleOpenUpload} onNavigateGame={goToGame} />
+      <Header
+        authorized={authorized}
+        signingIn={signingIn}
+        onLogin={handleLogin}
+        onOpenUpload={handleOpenUpload}
+        onNavigateGame={goToGame}
+      />
       
       {/* Hero Visual Section */}
-      <Hero onOpenUpload={handleOpenUpload} />
+      <Hero />
       
       {/* Main Gallery Area */}
       <AboutSection />
@@ -131,6 +174,8 @@ export default function App() {
         images={images}
         loading={loading}
         onSelectImage={handleSelectImage}
+        authorized={authorized}
+        onDeleteImage={handleDeleteImage}
       />
 
       {/* Footer Branding */}

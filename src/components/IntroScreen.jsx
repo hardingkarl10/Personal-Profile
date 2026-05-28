@@ -136,6 +136,7 @@ export default function IntroScreen({ onComplete }) {
   const boardRef   = useRef(null);
   const targetRef  = useRef(target);
   const holdTimer  = useRef(null);
+  const completeRef = useRef(null);
 
   useEffect(() => { targetRef.current = target; }, [target]);
 
@@ -186,7 +187,7 @@ export default function IntroScreen({ onComplete }) {
       const sq = toBoardSquare(e.touches[0].clientX, e.touches[0].clientY);
       if (sq) setTarget(sq);
       clearTimeout(holdTimer.current);
-      holdTimer.current = setTimeout(() => complete(), 800);
+      holdTimer.current = setTimeout(() => completeRef.current?.(), 800);
     };
     const onTouchMove = (e) => {
       e.preventDefault();
@@ -271,6 +272,8 @@ export default function IntroScreen({ onComplete }) {
 
     setTimeout(onComplete, 950);
   };
+
+  completeRef.current = complete;
 
   const handleClick = () => { if (!isMobile) complete(); };
 
