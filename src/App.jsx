@@ -213,6 +213,7 @@ export default function App() {
           flex-direction: column;
           position: relative;
           z-index: 1;
+          padding-top: 65px;
         }
 
         /* Toast Styling */

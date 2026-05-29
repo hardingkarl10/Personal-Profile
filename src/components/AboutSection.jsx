@@ -458,18 +458,6 @@ export default function AboutSection() {
         /* ── Skills — promoted to the dominant block ─────────────────────── */
         .skills-prominent {
           margin-bottom: 4rem;
-          padding: 2rem 2.25rem;
-          border-radius: 18px;
-          background: linear-gradient(
-            135deg,
-            rgba(var(--primary-rgb), 0.04) 0%,
-            rgba(var(--secondary-rgb), 0.03) 100%
-          );
-          border: 1px solid rgba(var(--primary-rgb), 0.12);
-        }
-
-        @media (max-width: 820px) {
-          .skills-prominent { padding: 1.5rem 1.25rem; }
         }
 
         .skills-prominent .block-heading {

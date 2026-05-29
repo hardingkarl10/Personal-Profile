@@ -85,6 +85,7 @@ html {
 body {
   min-height: 100vh;
   position: relative;
+  overflow-x: hidden;
   background-image:
     radial-gradient(circle at 10% 20%,
       rgba(var(--primary-rgb), 0.08) 0%,
@@ -93,6 +94,12 @@ body {
       rgba(var(--secondary-rgb), 0.08) 0%,
       transparent 40%);
   background-attachment: fixed;
+}
+
+@media (hover: none) and (pointer: coarse) {
+  body {
+    background-attachment: scroll;
+  }
 }
 
 /* Custom Scrollbar */

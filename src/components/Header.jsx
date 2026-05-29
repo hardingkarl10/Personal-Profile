@@ -64,7 +64,7 @@ export default function Header({ authorized, signingIn, onLogin, onOpenUpload, o
 
       <style>{`
         .header-glass {
-          position: sticky;
+          position: fixed;
           top: 0;
           left: 0;
           right: 0;
