@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Layers, User, Calendar, ExternalLink, SlidersHorizontal, Info, Trash2 } from 'lucide-react';
+import { Layers, ExternalLink, SlidersHorizontal, Info, Trash2 } from 'lucide-react';
 
 export default function Gallery({ images, loading, onSelectImage, authorized, onDeleteImage }) {
   const [activeCategory, setActiveCategory] = useState('All');
@@ -33,10 +33,10 @@ export default function Gallery({ images, loading, onSelectImage, authorized, on
 
       <div className="gallery-header">
         <div className="title-area">
-          <h2 className="section-title">Visual Portfolio</h2>
-          <p className="section-subtitle">A curated feed of dynamic assets fetched in real-time</p>
+          <h2 className="section-title">Photos by Karl Harding</h2>
+          <p className="section-subtitle">A curated feed of my 35mm film photography</p>
         </div>
-        
+
         {/* Category Filters */}
         <div className="filter-wrapper">
           <div className="filter-icon-box">
@@ -74,7 +74,7 @@ export default function Gallery({ images, loading, onSelectImage, authorized, on
         <div className="gallery-grid">
           {filteredImages.map((image, index) => {
             const isLoaded = loadedImages[image.id];
-            
+
             // Determine column span class based on aspect ratio
             let gridClass = 'card-normal';
             if (image.aspectRatio === 'wide') gridClass = 'card-wide';
@@ -98,7 +98,7 @@ export default function Gallery({ images, loading, onSelectImage, authorized, on
                     onLoad={() => handleImageLoad(image.id)}
                     className={`gallery-img ${isLoaded ? 'loaded' : ''}`}
                   />
-                  
+
                   {/* Category Badge on hover overlay */}
                   <span className="card-badge">{image.category}</span>
 
@@ -117,23 +117,15 @@ export default function Gallery({ images, loading, onSelectImage, authorized, on
                     </button>
                   )}
 
-                  {/* Hover visual details */}
-                  <div className="card-overlay">
-                    <span className="btn-expand">
-                      <ExternalLink size={16} /> View Details
-                    </span>
+                  {/* Title gradient overlay — always visible */}
+                  <div className="card-title-overlay">
+                    <h3 className="card-title">{image.title}</h3>
                   </div>
-                </div>
 
-                {/* Card Info */}
-                <div className="card-info">
-                  <h3 className="card-title">{image.title}</h3>
-                  <div className="card-meta">
-                    <span className="meta-item">
-                      <User size={12} /> {image.author}
-                    </span>
-                    <span className="meta-item">
-                      <Calendar size={12} /> {image.date}
+                  {/* Hover details */}
+                  <div className="card-hover-overlay">
+                    <span className="btn-expand">
+                      <ExternalLink size={16} /> View
                     </span>
                   </div>
                 </div>
@@ -288,6 +280,7 @@ export default function Gallery({ images, loading, onSelectImage, authorized, on
         .gallery-grid {
           display: grid;
           grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+          grid-auto-rows: 300px;
           grid-auto-flow: dense;
           gap: 1.5rem;
         }
@@ -295,6 +288,7 @@ export default function Gallery({ images, loading, onSelectImage, authorized, on
         @media (min-width: 1024px) {
           .gallery-grid {
             grid-template-columns: repeat(3, 1fr);
+            grid-auto-rows: 300px;
           }
           .card-wide {
             grid-column: span 2;
@@ -307,13 +301,12 @@ export default function Gallery({ images, loading, onSelectImage, authorized, on
         @media (min-width: 1400px) {
           .gallery-grid {
             grid-template-columns: repeat(4, 1fr);
+            grid-auto-rows: 280px;
           }
         }
 
         /* Card styles */
         .gallery-card {
-          display: flex;
-          flex-direction: column;
           cursor: pointer;
           border-color: var(--border-light);
           overflow: hidden;
@@ -326,23 +319,13 @@ export default function Gallery({ images, loading, onSelectImage, authorized, on
           box-shadow: var(--glow-primary);
         }
 
-        .card-wide .image-container {
-          aspect-ratio: 16/9;
-        }
-
-        .card-tall .image-container {
-          aspect-ratio: 2/3;
-          max-height: 520px;
-        }
-
         .image-container {
           position: relative;
           width: 100%;
-          aspect-ratio: 4/3;
-          flex-shrink: 0;
+          height: 100%;
           background: var(--ink-black);
           overflow: hidden;
-          border-radius: 15px 15px 0 0;
+          border-radius: 15px;
         }
 
         .absolute-fill {
@@ -416,19 +399,44 @@ export default function Gallery({ images, loading, onSelectImage, authorized, on
           z-index: 5;
         }
 
-        .card-overlay {
+        /* Persistent bottom gradient with title */
+        .card-title-overlay {
           position: absolute;
           inset: 0;
-          background: linear-gradient(to top, rgba(18, 69, 89, 0.85) 0%, transparent 60%);
+          background: linear-gradient(to top, rgba(8, 30, 40, 0.85) 0%, rgba(8, 30, 40, 0.3) 35%, transparent 60%);
           display: flex;
           align-items: flex-end;
-          justify-content: flex-start;
-          padding: 1.25rem;
+          padding: 1rem 1.1rem;
+          pointer-events: none;
+          transition: background 0.3s ease;
+        }
+
+        .gallery-card:hover .card-title-overlay {
+          background: linear-gradient(to top, rgba(8, 30, 40, 0.7) 0%, transparent 55%);
+        }
+
+        .card-title {
+          font-size: 0.95rem;
+          font-weight: 600;
+          color: rgba(255, 255, 255, 0.92);
+          line-height: 1.3;
+          text-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
+          margin: 0;
+        }
+
+        /* Hover overlay with view button */
+        .card-hover-overlay {
+          position: absolute;
+          inset: 0;
+          display: flex;
+          align-items: flex-end;
+          justify-content: flex-end;
+          padding: 1rem 1.1rem;
           opacity: 0;
           transition: var(--transition-fast);
         }
 
-        .gallery-card:hover .card-overlay {
+        .gallery-card:hover .card-hover-overlay {
           opacity: 1;
         }
 
@@ -436,53 +444,21 @@ export default function Gallery({ images, loading, onSelectImage, authorized, on
           display: inline-flex;
           align-items: center;
           gap: 0.4rem;
-          background: rgba(255, 255, 255, 0.1);
-          backdrop-filter: blur(4px);
-          -webkit-backdrop-filter: blur(4px);
-          border: 1px solid rgba(255, 255, 255, 0.15);
+          background: rgba(255, 255, 255, 0.12);
+          backdrop-filter: blur(6px);
+          -webkit-backdrop-filter: blur(6px);
+          border: 1px solid rgba(255, 255, 255, 0.18);
           color: var(--text-primary);
-          padding: 0.4rem 0.85rem;
+          padding: 0.35rem 0.8rem;
           border-radius: 6px;
-          font-size: 0.75rem;
+          font-size: 0.72rem;
           font-weight: 500;
-          transform: translateY(10px);
+          transform: translateY(6px);
           transition: var(--transition-bounce);
         }
 
         .gallery-card:hover .btn-expand {
           transform: translateY(0);
-        }
-
-        .card-info {
-          padding: 1.25rem;
-          display: flex;
-          flex-direction: column;
-          flex-grow: 1;
-          background: rgba(18, 69, 89, 0.3);
-          border-radius: 0 0 15px 15px;
-        }
-
-        .card-title {
-          font-size: 1.05rem;
-          margin-bottom: 0.5rem;
-          transition: var(--transition-fast);
-        }
-
-        .gallery-card:hover .card-title {
-          color: var(--primary);
-        }
-
-        .card-meta {
-          display: flex;
-          gap: 1rem;
-          font-size: 0.75rem;
-          color: var(--text-muted);
-        }
-
-        .meta-item {
-          display: flex;
-          align-items: center;
-          gap: 0.3rem;
         }
 
         /* Skeletons */
