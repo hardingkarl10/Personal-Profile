@@ -4,54 +4,12 @@ import React, { useState, useEffect } from "react";
 // White: ♔ ♕ ♖ ♗ ♘ ♙
 // Black: ♚ ♛ ♜ ♝ ♞ ♟
 const PIECES_CONFIG = [
-  {
-    id: "knight-w",
-    symbol: "♘",
-    name: "knight",
-    row: 1,
-    col: 2,
-    color: "var(--secondary)",
-  },
-  {
-    id: "rook-b",
-    symbol: "♜",
-    name: "rook",
-    row: 0,
-    col: 0,
-    color: "var(--primary)",
-  },
-  {
-    id: "bishop-w",
-    symbol: "♗",
-    name: "bishop",
-    row: 2,
-    col: 5,
-    color: "var(--accent)",
-  },
-  {
-    id: "queen-b",
-    symbol: "♛",
-    name: "queen",
-    row: 4,
-    col: 3,
-    color: "var(--primary)",
-  },
-  {
-    id: "pawn-1",
-    symbol: "♙",
-    name: "pawn",
-    row: 6,
-    col: 4,
-    color: "var(--text-muted)",
-  },
-  {
-    id: "knight-b",
-    symbol: "♞",
-    name: "knight",
-    row: 5,
-    col: 1,
-    color: "var(--secondary)",
-  },
+  { id: "knight-w", symbol: "♘︎", name: "knight", row: 1, col: 2, color: "var(--text-primary)" },
+  { id: "rook-b",   symbol: "♖︎", name: "rook",   row: 0, col: 0, color: "var(--text-primary)" },
+  { id: "bishop-w", symbol: "♗︎", name: "bishop", row: 2, col: 5, color: "var(--text-primary)" },
+  { id: "queen-b",  symbol: "♕︎", name: "queen",  row: 4, col: 3, color: "var(--text-primary)" },
+  { id: "pawn-1",   symbol: "♙︎", name: "pawn",   row: 6, col: 4, color: "var(--text-primary)" },
+  { id: "knight-b", symbol: "♘︎", name: "knight", row: 5, col: 1, color: "var(--text-primary)" },
 ];
 
 export default function ChessBackground() {
@@ -153,7 +111,6 @@ export default function ChessBackground() {
                 left: `${leftPercent}%`,
                 top: `${topPercent}%`,
                 color: piece.color,
-                textShadow: `0 0 10px ${piece.color}33`,
               }}
             >
               {piece.symbol}
@@ -168,7 +125,7 @@ export default function ChessBackground() {
           top: 50svh;
           left: 50vw;
           transform: translate(-50%, -50%) rotate(-8deg);
-          width: min(119vw, 119svh);
+          width: min(200vw, 200svh);
           aspect-ratio: 1/1;
           z-index: 0;
           pointer-events: none;
@@ -185,9 +142,6 @@ export default function ChessBackground() {
           border: 1px solid rgba(var(--primary-rgb), 0.15);
           border-radius: 4px;
           overflow: hidden;
-          box-shadow:
-            0 0 80px rgba(var(--primary-rgb), 0.1),
-            inset 0 0 40px rgba(165, 95, 63, 0.1);
         }
 
         .board-cell {
@@ -196,11 +150,11 @@ export default function ChessBackground() {
         }
 
         .cell-dark {
-          background: rgba(var(--accent-rgb), 0.1);
+          background: rgba(var(--accent-rgb), 0.35);
         }
 
         .cell-light {
-          background: rgba(var(--tertiary-rgb), 0.06);
+          background: rgba(var(--tertiary-rgb), 0.25);
         }
 
         .chess-bg-piece {
@@ -210,12 +164,11 @@ export default function ChessBackground() {
           display: flex;
           align-items: center;
           justify-content: center;
-          font-size: clamp(2.5rem, 5.6vw, 4.4rem);
+          font-size: clamp(6rem, 12vw, 11rem);
           line-height: 1;
           transition: left 1.4s cubic-bezier(0.25, 0.8, 0.25, 1), top 1.4s cubic-bezier(0.25, 0.8, 0.25, 1);
           font-weight: normal;
-          opacity: 0.25;
-          filter: drop-shadow(0 0 8px currentColor);
+          opacity: 0.45;
         }
       `}</style>
     </div>

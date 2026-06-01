@@ -10,8 +10,6 @@
   --olive: #7A7E3E;
   --ochre: #C9913A;
   --clay: #A55F3F;
-  --sea: #2B5963;
-
   /* ── Semantic Colors (Light Theme) ── */
   --bg-deep: #E8D9B8;
   --bg-deep-rgb: 232, 217, 184;
@@ -22,9 +20,9 @@
   --primary: #2B5963;
   --primary-rgb: 43, 89, 99;
   --primary-glow: rgba(43, 89, 99, 0.35);
-  --secondary: #7A7E3E;
-  --secondary-rgb: 122, 126, 62;
-  --secondary-glow: rgba(122, 126, 62, 0.3);
+  --secondary: #C9913A;
+  --secondary-rgb: 201, 145, 58;
+  --secondary-glow: rgba(201, 145, 58, 0.3);
   --accent: #A55F3F;
   --accent-rgb: 165, 95, 63;
   --tertiary: #C9913A;
@@ -92,24 +90,8 @@ body {
   min-height: 100vh;
   position: relative;
   overflow-x: hidden;
-  background-image:
-    radial-gradient(circle at 12% 18%,
-      rgba(var(--primary-rgb), 0.22) 0%,
-      transparent 42%),
-    radial-gradient(circle at 88% 82%,
-      rgba(var(--secondary-rgb), 0.2) 0%,
-      transparent 42%),
-    radial-gradient(circle at 50% 55%,
-      rgba(var(--tertiary-rgb), 0.18) 0%,
-      transparent 58%);
-  background-attachment: fixed;
 }
 
-@media (hover: none) and (pointer: coarse) {
-  body {
-    background-attachment: scroll;
-  }
-}
 
 /* Custom Scrollbar */
 ::-webkit-scrollbar {
@@ -176,28 +158,6 @@ p {
 }
 
 /* Glowing Ambient Spots */
-.glow-ambient {
-  position: absolute;
-  width: 350px;
-  height: 350px;
-  border-radius: 50%;
-  filter: blur(100px);
-  z-index: -1;
-  pointer-events: none;
-  opacity: 0.6;
-}
-
-.glow-purple {
-  background: var(--primary-glow);
-  top: 15%;
-  left: 20%;
-}
-
-.glow-cyan {
-  background: var(--secondary-glow);
-  bottom: 25%;
-  right: 15%;
-}
 
 /* Interactive Elements & Animations */
 .interactive-hover {

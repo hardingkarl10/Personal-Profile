@@ -2,14 +2,14 @@ import React, { useState, useEffect, useRef } from 'react';
 
 // ─── Chess pieces (spread around board edges to make convergence dramatic) ───
 const INITIAL_PIECES = [
-  { id: 'kn1', symbol: '♞', name: 'knight', row: 0, col: 1, color: 'var(--text-primary)' },
-  { id: 'kn2', symbol: '♞', name: 'knight', row: 7, col: 6, color: 'var(--text-primary)' },
-  { id: 'rk1', symbol: '♜', name: 'rook',   row: 0, col: 7, color: 'var(--text-primary)' },
-  { id: 'rk2', symbol: '♜', name: 'rook',   row: 7, col: 0, color: 'var(--text-primary)' },
-  { id: 'bs1', symbol: '♝', name: 'bishop', row: 0, col: 5, color: 'var(--text-primary)' },
-  { id: 'bs2', symbol: '♝', name: 'bishop', row: 7, col: 1, color: 'var(--text-primary)' },
-  { id: 'qn1', symbol: '♛', name: 'queen',  row: 0, col: 4, color: 'var(--text-primary)' },
-  { id: 'kg1', symbol: '♚', name: 'king',   row: 4, col: 0, color: 'var(--text-primary)' },
+  { id: 'kn1', symbol: '♘', name: 'knight', row: 0, col: 1, color: 'var(--text-primary)' },
+  { id: 'kn2', symbol: '♘', name: 'knight', row: 7, col: 6, color: 'var(--text-primary)' },
+  { id: 'rk1', symbol: '♖', name: 'rook',   row: 0, col: 7, color: 'var(--text-primary)' },
+  { id: 'rk2', symbol: '♖', name: 'rook',   row: 7, col: 0, color: 'var(--text-primary)' },
+  { id: 'bs1', symbol: '♗', name: 'bishop', row: 0, col: 5, color: 'var(--text-primary)' },
+  { id: 'bs2', symbol: '♗', name: 'bishop', row: 7, col: 1, color: 'var(--text-primary)' },
+  { id: 'qn1', symbol: '♕', name: 'queen',  row: 0, col: 4, color: 'var(--text-primary)' },
+  { id: 'kg1', symbol: '♔', name: 'king',   row: 4, col: 0, color: 'var(--text-primary)' },
 ];
 
 const BOARD_DEG = -8;
@@ -363,7 +363,7 @@ export default function IntroScreen({ onComplete }) {
           position: absolute;
           top: 50%;
           left: 50%;
-          width: min(119vw, 119vh);
+          width: min(200vw, 200vh);
           aspect-ratio: 1;
           transform: translate(-50%, -50%) rotate(${BOARD_DEG}deg);
           display: grid;
@@ -387,7 +387,7 @@ export default function IntroScreen({ onComplete }) {
           display: flex;
           align-items: center;
           justify-content: center;
-          font-size: clamp(2.5rem, 5.6vw, 4.4rem);
+          font-size: clamp(4rem, 9vw, 8rem);
           line-height: 1;
           opacity: 0.55;
           transition: left 0.55s cubic-bezier(0.25, 0.8, 0.25, 1),

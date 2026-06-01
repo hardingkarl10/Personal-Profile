@@ -152,10 +152,6 @@ export default function App() {
       {/* Animated Chess Board Ambient Background */}
       <ChessBackground />
       
-      {/* Background glow structures */}
-      <div className="glow-ambient glow-purple" style={{ top: '5%', left: '5%' }}></div>
-      <div className="glow-ambient glow-cyan" style={{ top: '35%', right: '5%' }}></div>
-      
       {/* Navigation Header */}
       <Header
         authorized={authorized}

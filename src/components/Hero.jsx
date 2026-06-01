@@ -47,7 +47,6 @@ export default function Hero() {
           transform: translateY(28px);
           transition: opacity 0.9s ease 0.15s,
                       transform 0.9s cubic-bezier(0.25, 0.8, 0.25, 1) 0.15s;
-          text-shadow: 0 0 80px rgba(var(--primary-rgb), 0.1);
         }
         .hero-section.visible .hero-name {
           opacity: 1;
