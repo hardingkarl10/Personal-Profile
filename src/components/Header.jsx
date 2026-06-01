@@ -69,10 +69,10 @@ export default function Header({ authorized, signingIn, onLogin, onOpenUpload, o
           left: 0;
           right: 0;
           z-index: 100;
-          background: rgba(18, 69, 89, 0.7);
+          background: rgba(255, 251, 245, 0.78);
           backdrop-filter: blur(20px);
           -webkit-backdrop-filter: blur(20px);
-          border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+          border-bottom: 1px solid rgba(165, 95, 63, 0.12);
           transition: var(--transition-smooth);
         }
 
@@ -186,7 +186,7 @@ export default function Header({ authorized, signingIn, onLogin, onOpenUpload, o
           height: 36px;
           border-radius: 50%;
           border: 1px solid var(--border-light);
-          background: rgba(255, 255, 255, 0.02);
+          background: rgba(165, 95, 63, 0.05);
           transition: var(--transition-fast);
           text-decoration: none;
         }
@@ -216,7 +216,7 @@ export default function Header({ authorized, signingIn, onLogin, onOpenUpload, o
 
         .btn-header-action:hover {
           background: var(--primary);
-          color: var(--bg-deep);
+          color: var(--text-primary);
           border-color: var(--primary);
           box-shadow: 0 0 15px rgba(var(--primary-rgb), 0.3);
           transform: translateY(-1px);

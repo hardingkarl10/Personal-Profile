@@ -11,7 +11,7 @@ import Footer from './components/Footer';
 import ChessBackground from './components/ChessBackground';
 import IntroScreen from './components/IntroScreen';
 import { getGalleryImages, deleteGalleryImage } from './services/storage';
-import { onAuthChange, signInWithGoogle, isAuthorized } from './services/auth';
+import { onAuthChange, signInWithGoogle, isAuthorized, consumeRedirectResult } from './services/auth';
 import { CheckCircle2 } from 'lucide-react';
 
 export default function App() {
@@ -43,6 +43,9 @@ export default function App() {
   const [authUser, setAuthUser] = useState(null);
   const [signingIn, setSigningIn] = useState(false);
 
+  useEffect(() => {
+    consumeRedirectResult().catch(err => console.error('Redirect sign-in failed:', err));
+  }, []);
   useEffect(() => onAuthChange(setAuthUser), []);
 
   const authorized = isAuthorized(authUser);

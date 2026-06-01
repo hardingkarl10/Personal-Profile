@@ -3,53 +3,58 @@
    ========================================================================== */
 /* Design Tokens & CSS Variables */
 :root {
-  /* ── Palette ── */
-  --ink-black: #01161e;
-  --dark-teal: #124559;
-  --dark-cyan: #598392;
-  --pearl-aqua: #aec3b0;
-  --vanilla-custard: #eff6e0;
+  /* ── Palette (First Texas House Mood Board) ── */
+  --ink-black: #2A1810;
+  --terra-cotta: #C16A4A;
+  --sand: #E8D9B8;
+  --olive: #7A7E3E;
+  --ochre: #C9913A;
+  --clay: #A55F3F;
+  --sea: #2B5963;
 
-  /* ── Semantic Colors ── */
-  --bg-deep: #01161e;
-  --bg-surface: rgba(18, 69, 89, 0.65);
-  --bg-card: rgba(18, 69, 89, 0.45);
-  --bg-surface-rgb: 18, 69, 89;
+  /* ── Semantic Colors (Light Theme) ── */
+  --bg-deep: #E8D9B8;
+  --bg-deep-rgb: 232, 217, 184;
+  --bg-surface: rgba(247, 238, 218, 0.7);
+  --bg-card: rgba(247, 238, 218, 0.55);
+  --bg-surface-rgb: 247, 238, 218;
 
-  --primary: #aec3b0;
-  --primary-rgb: 174, 195, 176;
-  --primary-glow: rgba(174, 195, 176, 0.25);
-  --secondary: #598392;
-  --secondary-rgb: 89, 131, 146;
-  --secondary-glow: rgba(89, 131, 146, 0.2);
-  --accent: #124559;
-  --accent-rgb: 18, 69, 89;
+  --primary: #2B5963;
+  --primary-rgb: 43, 89, 99;
+  --primary-glow: rgba(43, 89, 99, 0.35);
+  --secondary: #7A7E3E;
+  --secondary-rgb: 122, 126, 62;
+  --secondary-glow: rgba(122, 126, 62, 0.3);
+  --accent: #A55F3F;
+  --accent-rgb: 165, 95, 63;
+  --tertiary: #C9913A;
+  --tertiary-rgb: 201, 145, 58;
 
-  --success: #aec3b0;
-  --success-rgb: 174, 195, 176;
-  --success-light: #eff6e0;
-  --error: #c0392b;
-  --error-rgb: 192, 57, 43;
-  --error-light: #e74c3c;
+  --success: #6FA855;
+  --success-rgb: 111, 168, 85;
+  --success-light: #A8AC6E;
+  --error: #C16A4A;
+  --error-rgb: 193, 106, 74;
+  --error-light: #D58266;
 
-  --text-primary: #eff6e0;
-  --text-primary-rgb: 239, 246, 224;
-  --text-secondary: rgba(239, 246, 224, 0.7);
-  --text-muted: rgba(239, 246, 224, 0.45);
+  --text-primary: #2A1810;
+  --text-primary-rgb: 42, 24, 16;
+  --text-secondary: rgba(42, 24, 16, 0.72);
+  --text-muted: rgba(42, 24, 16, 0.5);
 
-  --border-light: rgba(239, 246, 224, 0.1);
-  --border-glow: rgba(174, 195, 176, 0.35);
+  --border-light: rgba(165, 95, 63, 0.16);
+  --border-glow: rgba(43, 89, 99, 0.45);
 
   /* Glassmorphism Defaults */
-  --glass-bg: rgba(1, 22, 30, 0.7);
-  --glass-border: rgba(239, 246, 224, 0.08);
-  --glass-blur: 16px;
+  --glass-bg: rgba(247, 238, 218, 0.65);
+  --glass-border: rgba(165, 95, 63, 0.12);
+  --glass-blur: 18px;
 
   /* Shadows & Glows */
-  --shadow-sm: 0 2px 8px -2px rgba(0, 0, 0, 0.5);
-  --shadow-md: 0 12px 24px -4px rgba(0, 0, 0, 0.6);
-  --shadow-lg: 0 20px 40px -8px rgba(0, 0, 0, 0.8);
-  --glow-primary: 0 0 25px rgba(174, 195, 176, 0.35);
+  --shadow-sm: 0 2px 8px -2px rgba(42, 24, 16, 0.1);
+  --shadow-md: 0 12px 28px -8px rgba(42, 24, 16, 0.14);
+  --shadow-lg: 0 24px 48px -12px rgba(42, 24, 16, 0.2);
+  --glow-primary: 0 0 28px rgba(43, 89, 99, 0.45);
 
   /* Fonts */
   --font-sans:
@@ -70,6 +75,7 @@
   box-sizing: border-box;
   margin: 0;
   padding: 0;
+  -webkit-tap-highlight-color: transparent;
 }
 
 html {
@@ -87,12 +93,15 @@ body {
   position: relative;
   overflow-x: hidden;
   background-image:
-    radial-gradient(circle at 10% 20%,
-      rgba(var(--primary-rgb), 0.08) 0%,
-      transparent 40%),
-    radial-gradient(circle at 90% 80%,
-      rgba(var(--secondary-rgb), 0.08) 0%,
-      transparent 40%);
+    radial-gradient(circle at 12% 18%,
+      rgba(var(--primary-rgb), 0.22) 0%,
+      transparent 42%),
+    radial-gradient(circle at 88% 82%,
+      rgba(var(--secondary-rgb), 0.2) 0%,
+      transparent 42%),
+    radial-gradient(circle at 50% 55%,
+      rgba(var(--tertiary-rgb), 0.18) 0%,
+      transparent 58%);
   background-attachment: fixed;
 }
 
@@ -112,7 +121,7 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--bg-card);
+  background: rgba(var(--accent-rgb), 0.35);
   border: 2px solid var(--bg-deep);
   border-radius: 6px;
   transition: var(--transition-fast);
@@ -224,7 +233,7 @@ p {
 }
 
 .shimmer-placeholder {
-  background: linear-gradient(90deg, var(--ink-black) 25%, var(--dark-teal) 50%, var(--ink-black) 75%);
+  background: linear-gradient(90deg, rgba(201, 145, 58, 0.2) 25%, rgba(201, 145, 58, 0.45) 50%, rgba(201, 145, 58, 0.2) 75%);
   background-size: 200% 100%;
   animation: shimmer 1.5s infinite linear;
 }
@@ -252,7 +261,7 @@ p {
   align-items: center;
   gap: 0.5rem;
   background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
-  color: var(--bg-deep);
+  color: var(--text-primary);
   border: none;
   padding: 0.75rem 1.75rem;
   border-radius: 9999px;

@@ -172,7 +172,7 @@ export default function Gallery({ images, loading, onSelectImage, authorized, on
         }
 
         .alert-text code {
-          background: rgba(255, 255, 255, 0.06);
+          background: rgba(165, 95, 63, 0.08);
           padding: 0.1rem 0.4rem;
           border-radius: 4px;
           color: var(--secondary);
@@ -250,7 +250,7 @@ export default function Gallery({ images, loading, onSelectImage, authorized, on
         }
 
         .filter-btn {
-          background: rgba(255, 255, 255, 0.02);
+          background: rgba(165, 95, 63, 0.05);
           border: 1px solid var(--border-light);
           color: var(--text-secondary);
           padding: 0.5rem 1.25rem;
@@ -265,36 +265,46 @@ export default function Gallery({ images, loading, onSelectImage, authorized, on
 
         .filter-btn:hover {
           color: var(--text-primary);
-          border-color: rgba(255, 255, 255, 0.15);
-          background: rgba(255, 255, 255, 0.04);
+          border-color: rgba(165, 95, 63, 0.25);
+          background: rgba(165, 95, 63, 0.1);
         }
 
         .filter-btn.active {
           background: var(--primary);
           border-color: var(--primary);
-          box-shadow: 0 0 15px rgba(var(--primary-rgb), 0.2);
-          color: var(--bg-deep);
+          box-shadow: 0 0 15px rgba(var(--primary-rgb), 0.25);
+          color: var(--text-primary);
         }
 
         /* Responsive Grid: Masonry visual layout via CSS Grid */
         .gallery-grid {
           display: grid;
-          grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-          grid-auto-rows: 300px;
+          grid-template-columns: repeat(2, 1fr);
+          grid-auto-rows: 180px;
           grid-auto-flow: dense;
-          gap: 1.5rem;
+          gap: 0.75rem;
+        }
+
+        @media (min-width: 640px) {
+          .gallery-grid {
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            grid-auto-rows: 300px;
+            gap: 1.5rem;
+          }
+        }
+
+        .card-wide {
+          grid-column: span 2;
+        }
+
+        .card-tall {
+          grid-row: span 2;
         }
 
         @media (min-width: 1024px) {
           .gallery-grid {
             grid-template-columns: repeat(3, 1fr);
             grid-auto-rows: 300px;
-          }
-          .card-wide {
-            grid-column: span 2;
-          }
-          .card-tall {
-            grid-row: span 2;
           }
         }
 
@@ -359,10 +369,10 @@ export default function Gallery({ images, loading, onSelectImage, authorized, on
           display: flex;
           align-items: center;
           justify-content: center;
-          background: rgba(0, 18, 25, 0.65);
+          background: var(--glass-bg);
           backdrop-filter: blur(8px);
           -webkit-backdrop-filter: blur(8px);
-          border: 1px solid rgba(255, 255, 255, 0.1);
+          border: 1px solid var(--glass-border);
           border-radius: 50%;
           color: var(--text-primary);
           cursor: pointer;
@@ -387,15 +397,15 @@ export default function Gallery({ images, loading, onSelectImage, authorized, on
           position: absolute;
           top: 1rem;
           left: 1rem;
-          background: rgba(18, 69, 89, 0.7);
+          background: var(--bg-card);
           backdrop-filter: blur(8px);
           -webkit-backdrop-filter: blur(8px);
-          border: 1px solid rgba(255, 255, 255, 0.08);
+          border: 1px solid var(--border-light);
           padding: 0.25rem 0.75rem;
           border-radius: 9999px;
           font-size: 0.75rem;
           font-weight: 600;
-          color: var(--secondary);
+          color: var(--text-secondary);
           z-index: 5;
         }
 
@@ -403,7 +413,7 @@ export default function Gallery({ images, loading, onSelectImage, authorized, on
         .card-title-overlay {
           position: absolute;
           inset: 0;
-          background: linear-gradient(to top, rgba(8, 30, 40, 0.85) 0%, rgba(8, 30, 40, 0.3) 35%, transparent 60%);
+          background: linear-gradient(to top, rgba(var(--accent-rgb), 0.9) 0%, rgba(var(--accent-rgb), 0.3) 35%, transparent 60%);
           display: flex;
           align-items: flex-end;
           padding: 1rem 1.1rem;
@@ -412,15 +422,16 @@ export default function Gallery({ images, loading, onSelectImage, authorized, on
         }
 
         .gallery-card:hover .card-title-overlay {
-          background: linear-gradient(to top, rgba(8, 30, 40, 0.7) 0%, transparent 55%);
+          background: linear-gradient(to top, rgba(var(--accent-rgb), 0.7) 0%, transparent 55%);
         }
 
         .card-title {
-          font-size: 0.95rem;
+          font-family: 'Aboreto', serif;
+          font-size: 1rem;
           font-weight: 600;
-          color: rgba(255, 255, 255, 0.92);
+          color: var(--text-primary);
           line-height: 1.3;
-          text-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
+          text-shadow: 0 1px 4px rgba(var(--accent-rgb), 0.8);
           margin: 0;
         }
 
@@ -444,10 +455,10 @@ export default function Gallery({ images, loading, onSelectImage, authorized, on
           display: inline-flex;
           align-items: center;
           gap: 0.4rem;
-          background: rgba(255, 255, 255, 0.12);
+          background: var(--glass-bg);
           backdrop-filter: blur(6px);
           -webkit-backdrop-filter: blur(6px);
-          border: 1px solid rgba(255, 255, 255, 0.18);
+          border: 1px solid var(--border-light);
           color: var(--text-primary);
           padding: 0.35rem 0.8rem;
           border-radius: 6px;
@@ -476,7 +487,7 @@ export default function Gallery({ images, loading, onSelectImage, authorized, on
           justify-content: center;
           padding: 5rem 2rem;
           text-align: center;
-          background: rgba(255, 255, 255, 0.01);
+          background: rgba(165, 95, 63, 0.04);
           border-color: var(--border-light);
         }
 

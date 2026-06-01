@@ -93,20 +93,19 @@ export default function Lightbox({ image, imageList, onClose, onNavigate }) {
         </button>
       )}
 
-      {/* Image — no key prop so the element stays mounted; src swap triggers onLoad */}
-      <img
-        ref={imgRef}
-        src={image.url}
-        alt={image.title}
-        className={`lb-img ${imgLoaded && !fading ? 'loaded' : ''}`}
-        onLoad={() => setImgLoaded(true)}
-        onTransitionEnd={handleTransitionEnd}
-        onClick={(e) => e.stopPropagation()}
-      />
-
-      {/* Title */}
-      <div className={`lb-title ${imgLoaded && !fading ? 'visible' : ''}`}>
-        {image.title}
+      {/* Image + title wrapped so title sits below image on mobile */}
+      <div className="lb-content" onClick={(e) => e.stopPropagation()}>
+        <img
+          ref={imgRef}
+          src={image.url}
+          alt={image.title}
+          className={`lb-img ${imgLoaded && !fading ? 'loaded' : ''}`}
+          onLoad={() => setImgLoaded(true)}
+          onTransitionEnd={handleTransitionEnd}
+        />
+        <div className={`lb-title ${imgLoaded && !fading ? 'visible' : ''}`}>
+          {image.title}
+        </div>
       </div>
 
       {/* Next arrow */}
@@ -121,7 +120,7 @@ export default function Lightbox({ image, imageList, onClose, onNavigate }) {
           position: fixed;
           inset: 0;
           z-index: 1000;
-          background: rgba(1, 16, 22, 0.96);
+          background: rgba(26, 22, 18, 0.96);
           display: flex;
           align-items: center;
           justify-content: center;
@@ -133,9 +132,16 @@ export default function Lightbox({ image, imageList, onClose, onNavigate }) {
           opacity: 1;
         }
 
-        .lb-img {
+        .lb-content {
+          display: flex;
+          flex-direction: column;
+          align-items: flex-start;
           max-width: 92vw;
-          max-height: 90vh;
+        }
+
+        .lb-img {
+          max-width: 100%;
+          max-height: 82vh;
           object-fit: contain;
           border-radius: 4px;
           opacity: 0;
@@ -150,15 +156,14 @@ export default function Lightbox({ image, imageList, onClose, onNavigate }) {
           transform: scale(1);
         }
 
+        /* Mobile: title flows just below the image */
         .lb-title {
-          position: absolute;
-          bottom: 2.5rem;
-          left: 2.5rem;
+          margin-top: 0.9rem;
           font-family: 'Aboreto', serif;
           font-weight: 400;
-          font-size: clamp(1rem, 2.5vw, 1.5rem);
+          font-size: 1rem;
           letter-spacing: 0.06em;
-          color: rgba(239, 246, 224, 0.9);
+          color: rgba(232, 217, 184, 0.9);
           text-shadow: 0 2px 20px rgba(0, 0, 0, 0.8);
           opacity: 0;
           transform: translateY(8px);
@@ -171,10 +176,21 @@ export default function Lightbox({ image, imageList, onClose, onNavigate }) {
           transform: translateY(0);
         }
 
-        @media (max-width: 600px) {
+        /* Desktop: title fixed at bottom-left of screen */
+        @media (min-width: 601px) {
+          .lb-content {
+            max-width: none;
+          }
+          .lb-img {
+            max-width: 92vw;
+            max-height: 90vh;
+          }
           .lb-title {
-            bottom: 1.5rem;
-            left: 1.25rem;
+            position: fixed;
+            bottom: 2.5rem;
+            left: 2.5rem;
+            margin-top: 0;
+            font-size: clamp(1rem, 2.5vw, 1.5rem);
           }
         }
 
@@ -184,7 +200,7 @@ export default function Lightbox({ image, imageList, onClose, onNavigate }) {
           right: 1.5rem;
           background: rgba(255, 255, 255, 0.04);
           border: 1px solid rgba(255, 255, 255, 0.1);
-          color: rgba(239, 246, 224, 0.7);
+          color: rgba(232, 217, 184, 0.7);
           width: 44px;
           height: 44px;
           border-radius: 50%;
@@ -208,7 +224,7 @@ export default function Lightbox({ image, imageList, onClose, onNavigate }) {
           transform: translateY(-50%);
           background: rgba(255, 255, 255, 0.03);
           border: 1px solid rgba(255, 255, 255, 0.08);
-          color: rgba(239, 246, 224, 0.6);
+          color: rgba(232, 217, 184, 0.6);
           width: 54px;
           height: 54px;
           border-radius: 50%;

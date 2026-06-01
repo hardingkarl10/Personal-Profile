@@ -165,10 +165,10 @@ export default function ChessBackground() {
       <style>{`
         .chess-bg-container {
           position: fixed;
-          top: 50%;
-          left: 50%;
+          top: 50svh;
+          left: 50vw;
           transform: translate(-50%, -50%) rotate(-8deg);
-          width: min(119vw, 119vh);
+          width: min(119vw, 119svh);
           aspect-ratio: 1/1;
           z-index: 0;
           pointer-events: none;
@@ -186,8 +186,8 @@ export default function ChessBackground() {
           border-radius: 4px;
           overflow: hidden;
           box-shadow:
-            0 0 80px rgba(var(--primary-rgb), 0.06),
-            inset 0 0 40px rgba(0, 0, 0, 0.3);
+            0 0 80px rgba(var(--primary-rgb), 0.1),
+            inset 0 0 40px rgba(165, 95, 63, 0.1);
         }
 
         .board-cell {
@@ -196,11 +196,11 @@ export default function ChessBackground() {
         }
 
         .cell-dark {
-          background: rgba(var(--primary-rgb), 0.07);
+          background: rgba(var(--accent-rgb), 0.1);
         }
 
         .cell-light {
-          background: rgba(255, 255, 255, 0.02);
+          background: rgba(var(--tertiary-rgb), 0.06);
         }
 
         .chess-bg-piece {

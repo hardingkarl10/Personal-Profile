@@ -349,7 +349,7 @@ export default function UploadPanel({ isOpen, onClose, onUploadSuccess }) {
           position: fixed;
           inset: 0;
           z-index: 900;
-          background: rgba(0, 18, 25, 0.6);
+          background: rgba(42, 24, 16, 0.35);
           backdrop-filter: blur(10px);
           -webkit-backdrop-filter: blur(10px);
           display: flex;
@@ -361,11 +361,11 @@ export default function UploadPanel({ isOpen, onClose, onUploadSuccess }) {
           width: 100%;
           max-width: 850px;
           margin-bottom: 2rem;
-          background: rgba(18, 69, 89, 0.95);
+          background: rgba(255, 251, 245, 0.97);
           border-color: var(--border-glow);
           border-radius: 20px;
           padding: 2rem;
-          box-shadow: 0 25px 50px -12px rgba(var(--primary-rgb), 0.25);
+          box-shadow: 0 25px 50px -12px rgba(42, 24, 16, 0.25);
           transform: translateY(0);
           max-height: 90vh;
           overflow-y: auto;
@@ -395,7 +395,7 @@ export default function UploadPanel({ isOpen, onClose, onUploadSuccess }) {
           align-items: center;
           margin-bottom: 1.5rem;
           padding-bottom: 1rem;
-          border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+          border-bottom: 1px solid rgba(165, 95, 63, 0.12);
         }
 
         .drawer-title-group {
@@ -432,7 +432,7 @@ export default function UploadPanel({ isOpen, onClose, onUploadSuccess }) {
 
         .btn-close-drawer:hover {
           color: var(--text-primary);
-          background: rgba(255, 255, 255, 0.05);
+          background: rgba(165, 95, 63, 0.08);
         }
 
         /* Status banner */
@@ -480,14 +480,14 @@ export default function UploadPanel({ isOpen, onClose, onUploadSuccess }) {
 
         /* Dropzone */
         .dropzone {
-          border: 2px dashed rgba(255, 255, 255, 0.12);
+          border: 2px dashed rgba(165, 95, 63, 0.22);
           border-radius: 12px;
           display: flex;
           align-items: center;
           justify-content: center;
           text-align: center;
           cursor: pointer;
-          background: rgba(255, 255, 255, 0.01);
+          background: rgba(165, 95, 63, 0.03);
           transition: var(--transition-fast);
           height: 100%;
           min-height: 200px;
@@ -532,7 +532,7 @@ export default function UploadPanel({ isOpen, onClose, onUploadSuccess }) {
         .file-hint {
           font-size: 0.7rem;
           color: var(--text-muted);
-          background: rgba(255, 255, 255, 0.03);
+          background: rgba(165, 95, 63, 0.07);
           padding: 0.15rem 0.5rem;
           border-radius: 4px;
         }
@@ -659,7 +659,7 @@ export default function UploadPanel({ isOpen, onClose, onUploadSuccess }) {
 
         .btn-text:hover {
           color: var(--text-primary);
-          background: rgba(255, 255, 255, 0.05);
+          background: rgba(165, 95, 63, 0.08);
         }
 
         /* Auth gate (sign-in / wrong-account screens) */
@@ -700,13 +700,13 @@ export default function UploadPanel({ isOpen, onClose, onUploadSuccess }) {
           display: flex;
           justify-content: flex-end;
           gap: 1rem;
-          border-top: 1px solid rgba(255, 255, 255, 0.06);
+          border-top: 1px solid rgba(165, 95, 63, 0.12);
           padding-top: 1.5rem;
           margin-top: 0.5rem;
         }
 
         .btn-cancel {
-          background: rgba(255, 255, 255, 0.03);
+          background: rgba(165, 95, 63, 0.06);
           border: 1px solid var(--border-light);
           color: var(--text-secondary);
           padding: 0.75rem 1.5rem;
@@ -719,7 +719,7 @@ export default function UploadPanel({ isOpen, onClose, onUploadSuccess }) {
         }
 
         .btn-cancel:hover {
-          background: rgba(255, 255, 255, 0.06);
+          background: rgba(165, 95, 63, 0.12);
           color: var(--text-primary);
         }
 

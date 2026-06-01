@@ -2,14 +2,14 @@ import React, { useState, useEffect, useRef } from 'react';
 
 // ─── Chess pieces (spread around board edges to make convergence dramatic) ───
 const INITIAL_PIECES = [
-  { id: 'kn1', symbol: '♘', name: 'knight', row: 0, col: 1, color: 'var(--text-primary)' },
+  { id: 'kn1', symbol: '♞', name: 'knight', row: 0, col: 1, color: 'var(--text-primary)' },
   { id: 'kn2', symbol: '♞', name: 'knight', row: 7, col: 6, color: 'var(--text-primary)' },
   { id: 'rk1', symbol: '♜', name: 'rook',   row: 0, col: 7, color: 'var(--text-primary)' },
-  { id: 'rk2', symbol: '♖', name: 'rook',   row: 7, col: 0, color: 'var(--text-primary)' },
-  { id: 'bs1', symbol: '♗', name: 'bishop', row: 0, col: 5, color: 'var(--text-primary)' },
+  { id: 'rk2', symbol: '♜', name: 'rook',   row: 7, col: 0, color: 'var(--text-primary)' },
+  { id: 'bs1', symbol: '♝', name: 'bishop', row: 0, col: 5, color: 'var(--text-primary)' },
   { id: 'bs2', symbol: '♝', name: 'bishop', row: 7, col: 1, color: 'var(--text-primary)' },
   { id: 'qn1', symbol: '♛', name: 'queen',  row: 0, col: 4, color: 'var(--text-primary)' },
-  { id: 'kg1', symbol: '♔', name: 'king',   row: 4, col: 0, color: 'var(--text-primary)' },
+  { id: 'kg1', symbol: '♚', name: 'king',   row: 4, col: 0, color: 'var(--text-primary)' },
 ];
 
 const BOARD_DEG = -8;
@@ -19,7 +19,7 @@ function validMoves(name, row, col, occupied = new Set()) {
   if (name === 'knight') {
     return [[-2,-1],[-2,1],[-1,-2],[-1,2],[1,-2],[1,2],[2,-1],[2,1]]
       .map(([dr, dc]) => ({ r: row + dr, c: col + dc }))
-      .filter(({ r, c }) => INSIDE(r, c));
+      .filter(({ r, c }) => INSIDE(r, c) && !occupied.has(`${r},${c}`));
   }
   const slideDirs = {
     rook:   [[-1,0],[1,0],[0,-1],[0,1]],
@@ -39,14 +39,14 @@ function validMoves(name, row, col, occupied = new Set()) {
   }
   return [[-1,0],[1,0],[0,-1],[0,1],[-1,-1],[-1,1],[1,-1],[1,1]]
     .map(([dr, dc]) => ({ r: row + dr, c: col + dc }))
-    .filter(({ r, c }) => INSIDE(r, c));
+    .filter(({ r, c }) => INSIDE(r, c) && !occupied.has(`${r},${c}`));
 }
 
 // Greedy bipartite assignment: each adjacent square around the mouse gets at
 // most one piece, each piece gets at most one square. Sorted by a combined
 // affinity + distance score so bishops naturally land on diagonals and sliding
 // pieces on cardinals, but any piece can take any square if needed to fill all 8.
-function assignTargets(pieces, tRow, tCol) {
+function assignTargets(pieces, tRow, tCol, prevAssignments = new Map()) {
   const adj = [];
   for (let dr = -1; dr <= 1; dr++) {
     for (let dc = -1; dc <= 1; dc++) {
@@ -60,12 +60,14 @@ function assignTargets(pieces, tRow, tCol) {
   pieces.forEach((p, i) => {
     const isBishop = p.name === 'bishop';
     const parity = isBishop ? (p.row + p.col) % 2 : -1;
+    const prev = prevAssignments.get(p.id);
     adj.forEach(sq => {
       if (parity !== -1 && (sq.r + sq.c) % 2 !== parity) return;
       const alreadyThere = (p.row === sq.r && p.col === sq.c) ? -500 : 0;
       const mismatch = isBishop === sq.cardinal ? 10 : 0;
       const dist = Math.abs(p.row - sq.r) + Math.abs(p.col - sq.c);
-      pairs.push({ i, sq, score: alreadyThere + mismatch + dist, isBishop });
+      const sticky = prev && prev.r === sq.r && prev.c === sq.c ? -4 : 0;
+      pairs.push({ i, sq, score: alreadyThere + mismatch + dist + sticky, isBishop });
     });
   });
 
@@ -137,6 +139,7 @@ export default function IntroScreen({ onComplete }) {
   const targetRef  = useRef(target);
   const holdTimer  = useRef(null);
   const completeRef = useRef(null);
+  const prevAssignRef = useRef(new Map());
 
   useEffect(() => { targetRef.current = target; }, [target]);
 
@@ -209,45 +212,55 @@ export default function IntroScreen({ onComplete }) {
     };
   }, [isMobile]);
 
-  // Move pieces toward target via BFS every tick
+  // Move pieces toward target via BFS — each piece on its own staggered timer
   useEffect(() => {
-    const id = setInterval(() => {
+    const movePiece = (pieceId) => {
       setPieces(prev => {
         const { row: tRow, col: tCol } = targetRef.current;
+        const i = prev.findIndex(p => p.id === pieceId);
+        if (i === -1) return prev;
+
         const next = [...prev];
+        const assignments = assignTargets(next, tRow, tCol, prevAssignRef.current);
+        const byId = new Map();
+        for (const [j, sq] of assignments.entries()) byId.set(next[j].id, sq);
+        prevAssignRef.current = byId;
 
-        // Assign each adjacent square to exactly one piece before moving anyone
-        const assignments = assignTargets(next, tRow, tCol);
+        const adj = assignments.get(i);
+        if (!adj || (next[i].row === adj.r && next[i].col === adj.c)) return prev;
 
-        const tryMove = (i) => {
-          const adj = assignments.get(i);
-          if (!adj || (next[i].row === adj.r && next[i].col === adj.c)) return true;
-          const step = bfsStep(next[i], adj.r, adj.c, next, tRow, tCol);
-          if (step) { next[i] = { ...next[i], row: step.r, col: step.c }; return true; }
-          return false;
-        };
-
-        // First pass — move whoever has a clear path
-        const order = [...next.keys()].sort(() => Math.random() - 0.5);
-        const blocked = [];
-        for (const i of order) {
-          if (!tryMove(i)) blocked.push(i);
+        const step = bfsStep(next[i], adj.r, adj.c, next, tRow, tCol);
+        if (step) {
+          next[i] = { ...next[i], row: step.r, col: step.c };
+          return next;
         }
 
-        // Second pass — retry pieces that were blocked; blockers may have moved
-        for (const i of blocked) {
-          if (!tryMove(i)) {
-            // Still stuck — random move so the piece yields and opens a path
-            const occ2 = new Set(next.filter((_, j) => j !== i).map(p => `${p.row},${p.col}`));
-            occ2.add(`${tRow},${tCol}`);
-            const any = validMoves(next[i].name, next[i].row, next[i].col, occ2);
-            if (any.length) next[i] = { ...next[i], ...any[Math.floor(Math.random() * any.length)] };
-          }
+        // Stuck — random move so the piece yields and opens a path
+        const occ = new Set(next.filter((_, j) => j !== i).map(p => `${p.row},${p.col}`));
+        occ.add(`${tRow},${tCol}`);
+        const any = validMoves(next[i].name, next[i].row, next[i].col, occ);
+        if (any.length) {
+          next[i] = { ...next[i], ...any[Math.floor(Math.random() * any.length)] };
+          return next;
         }
-        return next;
+        return prev;
       });
-    }, 650);
-    return () => clearInterval(id);
+    };
+
+    const cleanups = INITIAL_PIECES.map(p => {
+      const period = 600 + Math.random() * 250;
+      const phase  = Math.random() * 450;
+      let intervalId = null;
+      const timeoutId = setTimeout(() => {
+        movePiece(p.id);
+        intervalId = setInterval(() => movePiece(p.id), period);
+      }, phase);
+      return () => {
+        clearTimeout(timeoutId);
+        if (intervalId) clearInterval(intervalId);
+      };
+    });
+    return () => cleanups.forEach(c => c());
   }, []);
 
   // Flip name to header and exit
@@ -323,11 +336,11 @@ export default function IntroScreen({ onComplete }) {
 
       <style>{`
         .intro-overlay {
-          --bg-deep: #598392;
-          --primary-rgb: 174, 195, 176;
-          --accent-rgb: 18, 69, 89;
-          --text-primary: #eff6e0;
-          --text-primary-rgb: 239, 246, 224;
+          --bg-deep: #E8D9B8;
+          --primary-rgb: 43, 89, 99;
+          --accent-rgb: 165, 95, 63;
+          --text-primary: #2A1810;
+          --text-primary-rgb: 42, 24, 16;
           position: fixed;
           inset: 0;
           z-index: 9999;
@@ -363,9 +376,9 @@ export default function IntroScreen({ onComplete }) {
           pointer-events: none;
         }
         .intro-cell { width: 100%; height: 100%; transition: background 0.25s ease; }
-        .intro-board .cell-dark   { background: rgba(var(--accent-rgb), 0.4); }
-        .intro-board .cell-light  { background: rgba(255, 255, 255, 0.01); }
-        .intro-board .cell-target { background: rgba(var(--accent-rgb), 0.22) !important; }
+        .intro-board .cell-dark   { background: rgba(var(--accent-rgb), 0.18); }
+        .intro-board .cell-light  { background: rgba(var(--tertiary-rgb), 0.1); }
+        .intro-board .cell-target { background: rgba(var(--accent-rgb), 0.3) !important; }
 
         .intro-piece {
           position: absolute;

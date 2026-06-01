@@ -291,8 +291,8 @@ export default function AboutSection() {
           background: rgba(var(--text-primary-rgb), 0.03);
           border-radius: 62% 38% 47% 53% / 45% 62% 38% 55%;
           box-shadow:
-            0 30px 60px rgba(0, 0, 0, 0.35),
-            0 0 60px rgba(var(--primary-rgb), 0.08);
+            0 30px 60px rgba(42, 24, 16, 0.15),
+            0 0 60px rgba(var(--primary-rgb), 0.18);
           animation: blob-morph-a 18s ease-in-out infinite;
         }
 
@@ -476,32 +476,32 @@ export default function AboutSection() {
         }
 
         .pill-gold {
-          background: rgba(var(--primary-rgb), 0.08);
-          border-color: rgba(var(--primary-rgb), 0.2);
+          background: rgba(var(--primary-rgb), 0.18);
+          border-color: rgba(var(--primary-rgb), 0.35);
           color: var(--primary);
         }
-        .pill-gold:hover { background: rgba(var(--primary-rgb), 0.18); }
+        .pill-gold:hover { background: rgba(var(--primary-rgb), 0.28); }
 
         .pill-orange {
-          background: rgba(var(--secondary-rgb), 0.08);
-          border-color: rgba(var(--secondary-rgb), 0.2);
+          background: rgba(var(--secondary-rgb), 0.18);
+          border-color: rgba(var(--secondary-rgb), 0.35);
           color: var(--secondary);
         }
-        .pill-orange:hover { background: rgba(var(--secondary-rgb), 0.18); }
+        .pill-orange:hover { background: rgba(var(--secondary-rgb), 0.28); }
 
         .pill-red {
-          background: rgba(var(--accent-rgb), 0.08);
-          border-color: rgba(var(--accent-rgb), 0.2);
+          background: rgba(var(--accent-rgb), 0.18);
+          border-color: rgba(var(--accent-rgb), 0.35);
           color: var(--accent);
         }
-        .pill-red:hover { background: rgba(var(--accent-rgb), 0.18); }
+        .pill-red:hover { background: rgba(var(--accent-rgb), 0.28); }
 
         .pill-muted {
-          background: rgba(var(--text-primary-rgb), 0.04);
-          border-color: var(--border-light);
+          background: rgba(var(--text-primary-rgb), 0.1);
+          border-color: rgba(var(--text-primary-rgb), 0.2);
           color: var(--text-secondary);
         }
-        .pill-muted:hover { background: rgba(var(--text-primary-rgb), 0.08); }
+        .pill-muted:hover { background: rgba(var(--text-primary-rgb), 0.16); }
 
         /* ── Career rail — compact, anchored by years ─────────────────── */
         .career-section { margin-bottom: 2.5rem; }

@@ -201,7 +201,7 @@ export default function SkillsPool({ skillGroups }) {
           height: 320px;
           overflow: hidden;
           border-radius: 14px;
-          background: rgba(var(--text-primary-rgb), 0.025);
+          background: rgba(255, 251, 245, 0.6);
           border: 1px solid rgba(var(--primary-rgb), 0.1);
         }
 

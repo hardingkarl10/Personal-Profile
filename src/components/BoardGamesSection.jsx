@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Users, ExternalLink, Star } from 'lucide-react';
 
 const TOP_GAMES = [
@@ -57,6 +57,18 @@ const TOP_GAMES = [
 
 export default function BoardGamesSection() {
   const [loadedImages, setLoadedImages] = useState({});
+  const gridRef = useRef(null);
+
+  useEffect(() => {
+    const el = gridRef.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => { if (entry.isIntersecting) { el.classList.add('revealed'); observer.disconnect(); } },
+      { threshold: 0.1 }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
 
   const handleImageLoad = (id) => {
     setLoadedImages((prev) => ({ ...prev, [id]: true }));
@@ -81,7 +93,7 @@ export default function BoardGamesSection() {
         </div>
       </div>
 
-      <div className="bg-grid">
+      <div className="bg-grid" ref={gridRef}>
         {TOP_GAMES.map((game, index) => {
           const isLoaded = loadedImages[game.id];
           return (
@@ -90,8 +102,8 @@ export default function BoardGamesSection() {
               href={game.bggUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="bg-card glass-card interactive-hover animate-fade-in"
-              style={{ animationDelay: `${index * 0.07}s` }}
+              className="bg-card glass-card interactive-hover"
+              style={{ '--stagger': `${index * 0.1}s` }}
             >
               <div className="bg-image-wrap">
                 {!isLoaded && <div className="shimmer-placeholder absolute-fill" />}
@@ -166,6 +178,11 @@ export default function BoardGamesSection() {
           }
         }
 
+        @keyframes cardReveal {
+          from { opacity: 0; transform: translateY(32px); }
+          to   { opacity: 1; transform: translateY(0); }
+        }
+
         .bg-card {
           display: flex;
           flex-direction: column;
@@ -175,7 +192,12 @@ export default function BoardGamesSection() {
           border-color: var(--border-light);
           overflow: hidden;
           height: 100%;
+          opacity: 0;
           transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+        }
+
+        .bg-grid.revealed .bg-card {
+          animation: cardReveal 0.55s cubic-bezier(0.25, 0.8, 0.25, 1) var(--stagger, 0s) forwards;
         }
 
         .bg-card:hover {
@@ -187,7 +209,7 @@ export default function BoardGamesSection() {
         .bg-image-wrap {
           position: relative;
           width: 100%;
-          aspect-ratio: 3/4;
+          aspect-ratio: 1/1;
           flex-shrink: 0;
           background: var(--ink-black);
           overflow: hidden;
@@ -217,10 +239,10 @@ export default function BoardGamesSection() {
           display: flex;
           align-items: center;
           gap: 0.25rem;
-          background: rgba(var(--primary-rgb), 0.85);
+          background: rgba(var(--primary-rgb), 0.92);
           backdrop-filter: blur(6px);
           -webkit-backdrop-filter: blur(6px);
-          color: var(--bg-deep);
+          color: var(--text-primary);
           font-family: var(--font-display);
           font-weight: 800;
           font-size: 0.8rem;
@@ -232,7 +254,7 @@ export default function BoardGamesSection() {
         .bg-overlay {
           position: absolute;
           inset: 0;
-          background: linear-gradient(to top, rgba(18, 69, 89, 0.85) 0%, transparent 60%);
+          background: linear-gradient(to top, rgba(26, 22, 18, 0.9) 0%, transparent 60%);
           display: flex;
           align-items: flex-end;
           justify-content: center;
@@ -250,7 +272,7 @@ export default function BoardGamesSection() {
           display: flex;
           flex-direction: column;
           flex-grow: 1;
-          background: rgba(18, 69, 89, 0.3);
+          background: rgba(165, 95, 63, 0.18);
           border-radius: 0 0 15px 15px;
           gap: 0.4rem;
         }
